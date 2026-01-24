@@ -1,0 +1,129 @@
+.card {
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+}
+
+.code {
+  background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+  color: white;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.editBtn,
+.deleteBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.editBtn {
+  background: #eff6ff;
+  color: #3b82f6;
+}
+
+.editBtn:hover {
+  background: #3b82f6;
+  color: white;
+}
+
+.deleteBtn {
+  background: #fef2f2;
+  color: #ef4444;
+}
+
+.deleteBtn:hover {
+  background: #ef4444;
+  color: white;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: var(--spacing-xs);
+}
+
+.icon {
+  color: #64748b;
+}
+
+.unit {
+  font-size: var(--font-size-sm);
+  color: #64748b;
+  margin-bottom: var(--spacing-md);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-sm);
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--spacing-sm);
+  background: #f8fafc;
+  border-radius: var(--radius-md);
+}
+
+.statLabel {
+  font-size: var(--font-size-xs);
+  color: #64748b;
+  margin-bottom: 4px;
+}
+
+.statValue {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.statValue.nhap {
+  color: #16a34a;
+}
+
+.statValue.xuat {
+  color: #dc2626;
+}
+
+.statValue.tonKho {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: #1e293b;
+}

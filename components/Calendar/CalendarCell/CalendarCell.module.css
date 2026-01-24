@@ -1,0 +1,168 @@
+.cell {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: var(--spacing-sm);
+  background: white;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  overflow: hidden;
+}
+
+.cell:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+  transform: translateY(-2px);
+}
+
+.cell.today {
+  border: 2px solid #3b82f6;
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.cell.otherMonth {
+  background: #f8fafc;
+  opacity: 0.5;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-xs);
+  flex-shrink: 0;
+}
+
+.day {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.cell.today .day {
+  color: #2563eb;
+}
+
+.lunarDate {
+  font-size: 10px;
+  color: #64748b;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-weight: 500;
+}
+
+/* Order List - full width, scrollable */
+.orderList {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.orderList::-webkit-scrollbar {
+  width: 4px;
+}
+
+.orderList::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.orderList::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 2px;
+}
+
+.orderList::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Footer - enhanced styling */
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-top: auto;
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid #e2e8f0;
+  flex-shrink: 0;
+  gap: var(--spacing-sm);
+}
+
+.orderCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 8px;
+  background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+  color: white;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  box-shadow: 0 2px 4px rgba(220, 38, 38, 0.3);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.totalRevenue {
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+  color: #dc2626;
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  padding: 4px 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid #fecaca;
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  .cell {
+    min-height: 70px;
+    padding: 6px;
+  }
+
+  .orderList {
+    display: none;
+  }
+
+  .day {
+    font-size: var(--font-size-base);
+  }
+
+  .lunarDate {
+    display: none;
+  }
+
+  .footer {
+    flex-direction: column;
+    gap: 4px;
+    align-items: center;
+    padding-top: var(--spacing-xs);
+  }
+
+  .orderCount {
+    min-width: 20px;
+    height: 20px;
+    font-size: 10px;
+  }
+
+  .totalRevenue {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+}

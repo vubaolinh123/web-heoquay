@@ -1,0 +1,141 @@
+.tableContainer {
+  width: 100%;
+  overflow-x: auto;
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+}
+
+.headerRow {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+}
+
+.th {
+  padding: 14px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: var(--font-size-xs);
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+.thNumber {
+  composes: th;
+  text-align: center;
+}
+
+.thActions {
+  composes: th;
+  text-align: center;
+  width: 100px;
+}
+
+.row {
+  transition: all 0.2s ease;
+}
+
+.row:hover {
+  background: #f8fafc;
+}
+
+.row.even {
+  background: #fafbfc;
+}
+
+.row.even:hover {
+  background: #f1f5f9;
+}
+
+.td {
+  padding: 14px 16px;
+  font-size: var(--font-size-sm);
+  color: #475569;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.tdCode {
+  composes: td;
+  color: #2563eb;
+  font-weight: 600;
+}
+
+.tdName {
+  composes: td;
+  color: #1e293b;
+  font-weight: 500;
+}
+
+.tdNumber {
+  composes: td;
+  text-align: center;
+  font-weight: 500;
+}
+
+.tdNhap {
+  composes: tdNumber;
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.tdXuat {
+  composes: tdNumber;
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.tdTonKho {
+  composes: tdNumber;
+  color: #1e293b;
+  font-weight: 700;
+  font-size: var(--font-size-base);
+}
+
+.tdActions {
+  composes: td;
+  text-align: center;
+}
+
+.editBtn,
+.deleteBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin: 0 4px;
+}
+
+.editBtn {
+  background: #eff6ff;
+  color: #3b82f6;
+}
+
+.editBtn:hover {
+  background: #3b82f6;
+  color: white;
+  transform: scale(1.1);
+}
+
+.deleteBtn {
+  background: #fef2f2;
+  color: #ef4444;
+}
+
+.deleteBtn:hover {
+  background: #ef4444;
+  color: white;
+  transform: scale(1.1);
+}

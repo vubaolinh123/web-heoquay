@@ -1,26 +1,223 @@
-@import "tailwindcss";
-
+/* ===== CSS Variables - Heo Quay Theme ===== */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Primary Colors - Red Theme from Logo */
+  --color-primary: #D32F2F;
+  --color-primary-dark: #B71C1C;
+  --color-primary-light: #EF5350;
+  
+  /* Status Colors */
+  --color-success: #4CAF50;
+  --color-success-light: #E8F5E9;
+  --color-warning: #FF9800;
+  --color-warning-light: #FFF3E0;
+  --color-danger: #F44336;
+  --color-danger-light: #FFEBEE;
+  --color-info: #2196F3;
+  --color-info-light: #E3F2FD;
+  
+  /* Neutral Colors */
+  --color-background: #F5F5F5;
+  --color-surface: #FFFFFF;
+  --color-text-primary: #212121;
+  --color-text-secondary: #757575;
+  --color-text-disabled: #BDBDBD;
+  --color-border: #E0E0E0;
+  
+  /* Spacing - Mobile Optimized */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  
+  /* Typography */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  
+  /* Z-Index Layers */
+  --z-sticky: 50;
+  --z-dropdown: 100;
+  --z-modal: 200;
+  --z-toast: 300;
+  
+  /* Mobile Safe Areas */
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  
+  /* Layout Heights */
+  --bottom-nav-height: 64px;
+  --header-height: 100px;
+  --sticky-day-height: 48px;
+  
+  /* Container Widths - Responsive */
+  --container-mobile: 100%;
+  --container-tablet: 768px;
+  --container-desktop: 1200px;
+  
+  /* Grid Columns */
+  --grid-columns-mobile: 1;
+  --grid-columns-tablet: 2;
+  --grid-columns-desktop: 3;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ===== Reset & Base Styles ===== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-family);
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  line-height: 1.5;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+/* ===== Utility Classes ===== */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ===== Scrollbar Styling ===== */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: var(--radius-full);
+}
+
+/* ===== Focus States for Accessibility ===== */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ===== Print Styles ===== */
+/* When body has .printing class, hide everything except the modal */
+@media print {
+  /* Hide the main app layout */
+  body.printing #__next > *:not([data-print-modal]),
+  body.printing main,
+  body.printing header,
+  body.printing nav,
+  body.printing aside,
+  body.printing footer {
+    display: none !important;
+    visibility: hidden !important;
+  }
+  
+  /* Make sure print modal is visible */
+  body.printing [data-print-modal] {
+    display: block !important;
+    visibility: visible !important;
+    position: fixed !important;
+    inset: 0 !important;
+    background: white !important;
+    z-index: 99999 !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  
+  body.printing [data-print-modal] > div {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    max-height: none !important;
+    max-width: none !important;
+    overflow: visible !important;
+    width: 100% !important;
+    margin: 0 !important;
+  }
+  
+  body.printing [data-no-print] {
+    display: none !important;
+    visibility: hidden !important;
+  }
+  
+  body.printing [data-print-content] {
+    display: block !important;
+    visibility: visible !important;
+    padding: 20px !important;
+    background: white !important;
+  }
+  
+  body.printing [data-print-content] * {
+    visibility: visible !important;
+  }
 }

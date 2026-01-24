@@ -1,0 +1,173 @@
+.dailyHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-md);
+  background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%);
+  color: white;
+  border-radius: var(--radius-lg);
+  margin-top: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.dailyHeader::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  transform: translate(30%, -30%);
+}
+
+/* Row 1: Date Info */
+.topRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.dateInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.calendarIcon {
+  color: white;
+  opacity: 0.9;
+  flex-shrink: 0;
+}
+
+.dayOfWeek {
+  font-weight: 700;
+  font-size: var(--font-size-base);
+  color: white;
+  white-space: nowrap;
+}
+
+.solarDate {
+  font-size: var(--font-size-sm);
+  color: rgba(255, 255, 255, 0.85);
+  white-space: nowrap;
+}
+
+.lunarDate {
+  font-size: var(--font-size-xs);
+  color: #fbbf24;
+  font-weight: 600;
+  background-color: rgba(251, 191, 36, 0.2);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  border: 1px solid rgba(251, 191, 36, 0.4);
+}
+
+.orderCount {
+  font-size: var(--font-size-sm);
+  color: white;
+  font-weight: 700;
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 4px 14px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Row 2: Revenue + Actions */
+.bottomRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--spacing-sm);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  gap: var(--spacing-lg);
+}
+
+.totalRevenue {
+  font-size: var(--font-size-xl);
+  font-weight: 800;
+  color: #fef08a;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.currencySymbol {
+  font-size: var(--font-size-sm);
+  font-weight: 400;
+  color: #fef08a;
+}
+
+.actionButtons {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-left: var(--spacing-md);
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background-color: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  transition: all 0.2s;
+  cursor: pointer;
+  position: relative;
+  z-index: 5;
+}
+
+.actionButton:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+  transform: scale(1.05);
+}
+
+.actionButton:active {
+  background-color: rgba(255, 255, 255, 0.35);
+}
+
+/* Tablet and Desktop - single row */
+@media (min-width: 768px) {
+  .dailyHeader {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .topRow {
+    flex: 1;
+  }
+  
+  .bottomRow {
+    border-top: none;
+    padding-top: 0;
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+    padding-left: var(--spacing-lg);
+    margin-left: var(--spacing-md);
+    gap: var(--spacing-xl);
+  }
+  
+  .dayOfWeek {
+    font-size: var(--font-size-lg);
+  }
+  
+  .totalRevenue {
+    font-size: var(--font-size-2xl);
+  }
+
+  .actionButtons {
+    margin-left: var(--spacing-lg);
+  }
+}

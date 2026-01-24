@@ -1,0 +1,178 @@
+.container {
+  padding: var(--spacing-md);
+  background: #f8fafc;
+  min-height: 100%;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+}
+
+.titleSection {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.icon {
+  color: #dc2626;
+}
+
+.title {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.addBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: 10px 20px;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.addBtn:hover {
+  background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+/* Desktop: Show table, hide cards */
+.tableView {
+  display: none;
+}
+
+.cardView {
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .tableView {
+    display: block;
+  }
+
+  .cardView {
+    display: none;
+  }
+}
+
+/* Delete Confirmation Modal */
+.confirmOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-md);
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.confirmModal {
+  background: white;
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-xl);
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  animation: scaleIn 0.2s ease;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.confirmTitle {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 var(--spacing-md);
+}
+
+.confirmText {
+  font-size: var(--font-size-sm);
+  color: #64748b;
+  margin: 0 0 var(--spacing-lg);
+}
+
+.confirmActions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: center;
+}
+
+.cancelBtn {
+  padding: 10px 24px;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: #64748b;
+  background: #f1f5f9;
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancelBtn:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+.deleteBtn {
+  padding: 10px 24px;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: white;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.deleteBtn:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .container {
+    padding: var(--spacing-sm);
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .addBtn {
+    justify-content: center;
+  }
+}

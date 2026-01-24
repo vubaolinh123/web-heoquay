@@ -1,0 +1,179 @@
+.stickyHeader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: var(--z-dropdown);
+  background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+  color: white;
+  border-bottom: 3px solid #b91c1c;
+  padding: var(--spacing-sm) var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  box-shadow: 0 4px 20px rgba(220, 38, 38, 0.3);
+  transition: all 0.3s ease;
+}
+
+.stickyHeader.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.stickyHeader.hidden {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-100%);
+  pointer-events: none;
+}
+
+/* Row 1: Date + Actions */
+.topRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.leftSection {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.calendarIcon {
+  color: white;
+  opacity: 0.9;
+}
+
+.dateInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.mainDate {
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.lunarDate {
+  font-size: var(--font-size-xs);
+  color: #fef3c7;
+  font-weight: 600;
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.actions {
+  display: flex;
+  gap: var(--spacing-xs);
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-lg);
+  background-color: rgba(255, 255, 255, 0.15);
+  color: white;
+  transition: all 0.25s ease;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.actionButton:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+  transform: scale(1.05);
+}
+
+.actionButton:active {
+  background-color: rgba(255, 255, 255, 0.35);
+  transform: scale(0.98);
+}
+
+/* Row 2: Order Count + Total Revenue */
+.bottomRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--spacing-xs);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  gap: var(--spacing-xl);
+}
+
+.statsSection {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.orderCount {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.orderCountNumber {
+  font-size: var(--font-size-xl);
+  font-weight: 800;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.orderCountLabel {
+  font-size: var(--font-size-sm);
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 500;
+}
+
+.totalRevenue {
+  font-size: var(--font-size-xl);
+  font-weight: 800;
+  color: white;
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Tablet/Desktop Responsive */
+@media (min-width: 768px) {
+  .stickyHeader {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-md) var(--spacing-xl);
+  }
+  
+  .topRow {
+    flex: 1;
+  }
+  
+  .bottomRow {
+    border-top: none;
+    padding-top: 0;
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+    padding-left: var(--spacing-lg);
+    margin-left: var(--spacing-lg);
+  }
+  
+  .mainDate {
+    font-size: var(--font-size-lg);
+  }
+  
+  .orderCountNumber {
+    font-size: var(--font-size-2xl);
+  }
+  
+  .totalRevenue {
+    font-size: var(--font-size-2xl);
+  }
+}

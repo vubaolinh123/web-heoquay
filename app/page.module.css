@@ -1,0 +1,64 @@
+.orderList {
+  display: flex;
+  flex-direction: column;
+}
+
+.stickyHeaderSpacer {
+  height: 56px;
+}
+
+.daySection {
+  display: flex;
+  flex-direction: column;
+}
+
+.orders {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Desktop - full width rows, no grid */
+@media (min-width: 768px) {
+  .orders {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+@media (min-width: 1024px) {
+  .orders {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+/* Empty State */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl);
+  text-align: center;
+  min-height: 200px;
+  color: var(--color-text-secondary);
+}
+
+.emptyState p {
+  font-size: var(--font-size-base);
+  margin-bottom: var(--spacing-md);
+}
+
+.clearSearchButton {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--color-primary);
+  color: white;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.clearSearchButton:hover {
+  background-color: var(--color-primary-dark);
+}
