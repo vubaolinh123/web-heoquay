@@ -75,12 +75,17 @@ export default function InventoryModal({ isOpen, item, onClose, onSave }: Invent
                             <label className={styles.label}>MÃ NVL (*)</label>
                             <input
                                 type="text"
-                                className={styles.input}
+                                className={`${styles.input} ${isEdit ? styles.inputDisabled : ""}`}
                                 value={formData.maNVL}
                                 onChange={(e) => handleChange("maNVL", e.target.value)}
                                 placeholder="VD: NVLHC3"
                                 required
+                                disabled={isEdit}
+                                title={isEdit ? "Không thể sửa mã vật liệu" : ""}
                             />
+                            {isEdit && (
+                                <span className={styles.lockedHint}>🔒 Mã vật liệu không thể thay đổi</span>
+                            )}
                         </div>
                         <div className={styles.field}>
                             <label className={styles.label}>ĐƠN VỊ TÍNH</label>

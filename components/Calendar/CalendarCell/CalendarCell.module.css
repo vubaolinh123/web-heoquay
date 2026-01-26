@@ -166,3 +166,42 @@
     padding: 2px 6px;
   }
 }
+
+/* Tablet - fixed height cells with scrollable order list */
+@media (min-width: 768px) {
+  .cell {
+    height: 200px;
+    max-height: 200px;
+  }
+  
+  .orderList {
+    flex: 1;
+    min-height: 0;
+    max-height: 120px;
+    overflow-y: auto;
+  }
+}
+
+/* Desktop - larger cells */
+@media (min-width: 1024px) {
+  .cell {
+    height: 280px;
+    max-height: 280px;
+  }
+  
+  .orderList {
+    max-height: 180px;
+  }
+}
+
+/* Large Desktop */
+@media (min-width: 1280px) {
+  .cell {
+    height: 320px;
+    max-height: 320px;
+  }
+  
+  .orderList {
+    max-height: 220px;
+  }
+}

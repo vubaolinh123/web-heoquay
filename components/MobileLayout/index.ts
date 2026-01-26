@@ -1,1 +1,1 @@
-export { default, type FilterStatus } from "./MobileLayout";
+export { default, type FilterStatus, type FilterOption } from "./MobileLayout";

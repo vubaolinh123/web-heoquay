@@ -42,13 +42,13 @@
   grid-template-columns: repeat(7, 1fr);
   min-height: 0;
   overflow-y: auto;
+  align-items: start; /* Cells maintain their own height */
+  gap: 1px;
+  background: #e2e8f0;
+  padding: 1px;
 }
 
-/* Each cell takes full height */
-.grid > div {
-  min-height: 0;
-  height: 100%;
-}
+/* Remove height 100% - let cells have fixed height from CalendarCell.module.css */
 
 /* Mobile - vertical layout */
 @media (max-width: 767px) {

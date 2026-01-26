@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { CalendarViewMode, DonHang } from "@/lib/types";
-import { mockDonHangs, getOrdersByDate } from "@/lib/mockData";
+import { useOrders } from "@/contexts";
 import MobileLayout from "@/components/MobileLayout";
 import CalendarHeader from "@/components/Calendar/CalendarHeader";
 import styles from "./page.module.css";
@@ -22,21 +22,11 @@ const DayView = dynamic(() => import("@/components/Calendar/DayView"), {
 });
 
 export default function LichPage() {
-    const [viewMode, setViewMode] = useState<CalendarViewMode>("week");
-    const [currentDate, setCurrentDate] = useState(new Date(2026, 0, 24)); // Start at Jan 24, 2026 for demo
+    // Get orders data from shared context
+    const { orders, ordersMap, isLoading, error, refetch } = useOrders();
 
-    // Build orders map for calendar views
-    const ordersMap = useMemo(() => {
-        const map = new Map<string, DonHang[]>();
-        mockDonHangs.forEach((order) => {
-            const dateKey = order.ngay.toISOString().split("T")[0];
-            if (!map.has(dateKey)) {
-                map.set(dateKey, []);
-            }
-            map.get(dateKey)!.push(order);
-        });
-        return map;
-    }, []);
+    const [viewMode, setViewMode] = useState<CalendarViewMode>("week");
+    const [currentDate, setCurrentDate] = useState(new Date()); // Start with today
 
     // Get orders for current day (for DayView)
     const dayOrders = useMemo(() => {
@@ -71,6 +61,36 @@ export default function LichPage() {
     const handleViewModeChange = (mode: CalendarViewMode) => {
         setViewMode(mode);
     };
+
+    // Loading state
+    if (isLoading) {
+        return (
+            <MobileLayout>
+                <div className={styles.container}>
+                    <div className={styles.loadingState}>
+                        <div className={styles.spinner}></div>
+                        <p>Đang tải lịch...</p>
+                    </div>
+                </div>
+            </MobileLayout>
+        );
+    }
+
+    // Error state
+    if (error) {
+        return (
+            <MobileLayout>
+                <div className={styles.container}>
+                    <div className={styles.errorState}>
+                        <p className={styles.errorMessage}>⚠️ {error}</p>
+                        <button className={styles.retryButton} onClick={refetch}>
+                            Thử lại
+                        </button>
+                    </div>
+                </div>
+            </MobileLayout>
+        );
+    }
 
     return (
         <MobileLayout>

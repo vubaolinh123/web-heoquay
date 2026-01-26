@@ -1,4 +1,6 @@
 import type { Metadata, Viewport } from "next";
+import { OrdersProvider, AuthProvider } from "@/contexts";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -35,7 +37,17 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <AuthProvider>
+          <ProtectedRoute>
+            <OrdersProvider>
+              {children}
+            </OrdersProvider>
+          </ProtectedRoute>
+        </AuthProvider>
+      </body>
     </html>
   );
 }
+
+

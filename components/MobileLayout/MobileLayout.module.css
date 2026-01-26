@@ -104,6 +104,39 @@
   transform: scale(0.98);
 }
 
+/* Auth Button */
+.authButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  padding: 8px 12px;
+  border-radius: var(--radius-lg);
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  transition: all 0.25s ease;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.authButton:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.authButtonText {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .authButtonText {
+    display: inline;
+  }
+}
+
 /* ===== Search Bar ===== */
 .searchContainer {
   display: none;
@@ -296,6 +329,72 @@
   transform: translateY(-50%);
   color: rgba(255, 255, 255, 0.7);
   pointer-events: none;
+}
+
+/* Dropdown Active State - when filter is selected */
+.dropdownActive {
+  background-color: white;
+  color: #dc2626;
+  border-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.dropdownActive option {
+  background-color: white;
+  color: #1e293b;
+}
+
+/* Clear Filters Button */
+.clearFiltersButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  padding: 8px 12px;
+  border-radius: var(--radius-lg);
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.clearFiltersButton:hover {
+  background-color: rgba(255, 255, 255, 0.35);
+  transform: scale(1.02);
+}
+
+.clearFiltersButton:active {
+  background-color: rgba(255, 255, 255, 0.45);
+  transform: scale(0.98);
+}
+
+/* Mobile: show only icon */
+.clearFiltersText {
+  display: none;
+}
+
+/* Tablet/Desktop: show text */
+@media (min-width: 480px) {
+  .clearFiltersText {
+    display: inline;
+  }
+}
+
+/* Even smaller padding on very small screens */
+@media (max-width: 360px) {
+  .clearFiltersButton {
+    padding: 6px 8px;
+  }
+  
+  .dropdownSelect {
+    min-width: 100px;
+    padding: 6px 28px 6px 10px;
+    font-size: var(--font-size-xs);
+  }
 }
 
 /* ===== Main Content ===== */

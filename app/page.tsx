@@ -1,22 +1,43 @@
 "use client";
 
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
-import MobileLayout, { FilterStatus } from "@/components/MobileLayout";
+import { useSearchParams } from "next/navigation";
+import MobileLayout, { FilterStatus, FilterOption } from "@/components/MobileLayout";
 import DailyHeader from "@/components/DailyHeader";
 import OrderCard from "@/components/OrderCard";
 import OrderDetailModal from "@/components/OrderDetailModal";
 import StickyDayHeader from "@/components/StickyDayHeader";
 import { KitchenSlipModal, ReportModal } from "@/components/Print";
-import { getMockData } from "@/lib/mockData";
+import { ordersApi, transformApiOrder, groupOrdersByDate } from "@/lib/api";
+import { formatTien } from "@/lib/mockData";
 import { DonHang, DonHangTheoNgay } from "@/lib/types";
 import styles from "./page.module.css";
 
 export default function HomePage() {
+  const searchParams = useSearchParams();
+
   const [selectedOrder, setSelectedOrder] = useState<DonHang | null>(null);
   const [activeFilter, setActiveFilter] = useState<FilterStatus>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentVisibleDay, setCurrentVisibleDay] = useState<DonHangTheoNgay | null>(null);
   const [showStickyHeader, setShowStickyHeader] = useState(false);
+
+  // API State
+  const [allOrdersGroupedByDay, setAllOrdersGroupedByDay] = useState<DonHangTheoNgay[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Date and Branch filter state - initialize from URL query
+  const [selectedDate, setSelectedDate] = useState(() => searchParams.get("date") || "");
+  const [selectedBranch, setSelectedBranch] = useState("");
+
+  // Sync selectedDate when URL changes
+  useEffect(() => {
+    const dateParam = searchParams.get("date");
+    if (dateParam !== null) {
+      setSelectedDate(dateParam);
+    }
+  }, [searchParams]);
 
   // Print modal state
   const [printModalData, setPrintModalData] = useState<{
@@ -29,7 +50,27 @@ export default function HomePage() {
   const daySectionRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const observerRef = useRef<IntersectionObserver | null>(null);
 
-  const allOrdersGroupedByDay = getMockData();
+  // Fetch orders from API
+  const fetchOrders = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const apiOrders = await ordersApi.getOrders();
+      const transformedOrders = apiOrders.map(transformApiOrder);
+      const groupedOrders = groupOrdersByDate(transformedOrders);
+      setAllOrdersGroupedByDay(groupedOrders);
+    } catch (err) {
+      console.error("Failed to fetch orders:", err);
+      setError(err instanceof Error ? err.message : "Có lỗi xảy ra khi tải đơn hàng");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Initial data fetch
+  useEffect(() => {
+    fetchOrders();
+  }, [fetchOrders]);
 
   // Filter and search logic
   const filteredData = useMemo(() => {
@@ -53,6 +94,22 @@ export default function HomePage() {
         );
       }
 
+      // Apply date filter
+      if (selectedDate) {
+        const filterDateStr = selectedDate;
+        filteredOrders = filteredOrders.filter((d) => {
+          const orderDateStr = d.ngay.toISOString().split("T")[0];
+          return orderDateStr === filterDateStr;
+        });
+      }
+
+      // Apply branch filter
+      if (selectedBranch) {
+        filteredOrders = filteredOrders.filter(
+          (d) => d.chiNhanh === selectedBranch
+        );
+      }
+
       return {
         ...day,
         donHangs: filteredOrders,
@@ -60,7 +117,7 @@ export default function HomePage() {
         tongDoanhThu: filteredOrders.reduce((sum, d) => sum + d.tongTien, 0),
       };
     }).filter((day) => day.donHangs.length > 0);
-  }, [allOrdersGroupedByDay, activeFilter, searchQuery]);
+  }, [allOrdersGroupedByDay, activeFilter, searchQuery, selectedDate, selectedBranch]);
 
   // Calculate order counts for tabs
   const orderCounts = useMemo(() => {
@@ -70,6 +127,53 @@ export default function HomePage() {
       pending: allOrders.filter((d) => d.trangThai === "chua_giao").length,
       delivered: allOrders.filter((d) => d.trangThai === "da_giao").length,
     };
+  }, [allOrdersGroupedByDay]);
+
+  // Generate dynamic date options from API data
+  const dateOptions = useMemo<FilterOption[]>(() => {
+    const allOrders = allOrdersGroupedByDay.flatMap((d) => d.donHangs);
+    const uniqueDates = new Set<string>();
+
+    allOrders.forEach((order) => {
+      const dateStr = order.ngay.toISOString().split("T")[0];
+      uniqueDates.add(dateStr);
+    });
+
+    const sortedDates = Array.from(uniqueDates).sort((a, b) => b.localeCompare(a)); // Newest first
+
+    const options: FilterOption[] = [{ value: "", label: "Ngày giao hàng" }];
+    sortedDates.forEach((dateStr) => {
+      const date = new Date(dateStr);
+      const label = date.toLocaleDateString("vi-VN", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      });
+      options.push({ value: dateStr, label });
+    });
+
+    return options;
+  }, [allOrdersGroupedByDay]);
+
+  // Generate dynamic branch options from API data
+  const branchOptions = useMemo<FilterOption[]>(() => {
+    const allOrders = allOrdersGroupedByDay.flatMap((d) => d.donHangs);
+    const uniqueBranches = new Set<string>();
+
+    allOrders.forEach((order) => {
+      if (order.chiNhanh) {
+        uniqueBranches.add(order.chiNhanh);
+      }
+    });
+
+    const sortedBranches = Array.from(uniqueBranches).sort();
+
+    const options: FilterOption[] = [{ value: "", label: "Chi nhánh" }];
+    sortedBranches.forEach((branch) => {
+      options.push({ value: branch, label: branch });
+    });
+
+    return options;
   }, [allOrdersGroupedByDay]);
 
   // Setup IntersectionObserver for sticky header
@@ -183,6 +287,50 @@ export default function HomePage() {
     setPrintModalData(null);
   };
 
+  // Clear date and branch filters
+  const handleClearFilters = useCallback(() => {
+    setSelectedDate("");
+    setSelectedBranch("");
+  }, []);
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <MobileLayout
+        activeFilter={activeFilter}
+        onFilterChange={setActiveFilter}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        orderCounts={{ all: 0, pending: 0, delivered: 0 }}
+      >
+        <div className={styles.loadingState}>
+          <div className={styles.spinner}></div>
+          <p>Đang tải đơn hàng...</p>
+        </div>
+      </MobileLayout>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <MobileLayout
+        activeFilter={activeFilter}
+        onFilterChange={setActiveFilter}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        orderCounts={{ all: 0, pending: 0, delivered: 0 }}
+      >
+        <div className={styles.errorState}>
+          <p className={styles.errorMessage}>⚠️ {error}</p>
+          <button className={styles.retryButton} onClick={fetchOrders}>
+            Thử lại
+          </button>
+        </div>
+      </MobileLayout>
+    );
+  }
+
   return (
     <MobileLayout
       activeFilter={activeFilter}
@@ -190,6 +338,13 @@ export default function HomePage() {
       searchQuery={searchQuery}
       onSearchChange={setSearchQuery}
       orderCounts={orderCounts}
+      selectedDate={selectedDate}
+      onDateChange={setSelectedDate}
+      selectedBranch={selectedBranch}
+      onBranchChange={setSelectedBranch}
+      dateOptions={dateOptions}
+      branchOptions={branchOptions}
+      onClearFilters={handleClearFilters}
     >
       {/* Sticky Day Header */}
       {currentVisibleDay && (

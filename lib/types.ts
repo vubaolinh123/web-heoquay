@@ -32,6 +32,8 @@ export interface DonHang {
     diaChiGiao?: string;   // Delivery address
     ngayGiao?: Date;       // Delivery date
     gioGiao?: string;      // Delivery time
+    chiNhanh?: string;     // Branch (e.g., "Chi Nhánh 1")
+    hinhThucGiao?: string; // Delivery method (e.g., "Giao hàng", "Đến lấy")
 }
 
 export interface DonHangTheoNgay {

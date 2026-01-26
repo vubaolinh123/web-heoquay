@@ -40,9 +40,12 @@
   flex: 1;
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  grid-auto-rows: 1fr;
   min-height: 0;
   overflow-y: auto;
+  align-items: start;
+  gap: 1px;
+  background: #e2e8f0;
+  padding: 1px;
 }
 
 /* Mobile */
@@ -50,5 +53,29 @@
   .dayHeader {
     padding: var(--spacing-xs);
     font-size: var(--font-size-xs);
+  }
+}
+
+/* Tablet - smaller cells for month grid */
+@media (min-width: 768px) {
+  .grid > div {
+    height: 140px;
+    max-height: 140px;
+  }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .grid > div {
+    height: 160px;
+    max-height: 160px;
+  }
+}
+
+/* Large Desktop */
+@media (min-width: 1280px) {
+  .grid > div {
+    height: 180px;
+    max-height: 180px;
   }
 }

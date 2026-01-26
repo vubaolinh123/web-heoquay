@@ -2,7 +2,7 @@
 
 import { ReactNode, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
     ClipboardList,
     Calendar,
@@ -12,10 +12,19 @@ import {
     RefreshCw,
     X,
     ChevronDown,
+    LogIn,
+    LogOut,
+    User,
 } from "lucide-react";
+import { useAuth } from "@/contexts";
 import styles from "./MobileLayout.module.css";
 
 export type FilterStatus = "all" | "pending" | "delivered";
+
+export interface FilterOption {
+    value: string;
+    label: string;
+}
 
 interface MobileLayoutProps {
     children: ReactNode;
@@ -32,6 +41,11 @@ interface MobileLayoutProps {
     onDateChange?: (date: string) => void;
     selectedBranch?: string;
     onBranchChange?: (branch: string) => void;
+    // Dynamic filter options from API data
+    dateOptions?: FilterOption[];
+    branchOptions?: FilterOption[];
+    // Clear all dropdown filters
+    onClearFilters?: () => void;
 }
 
 const navItems = [
@@ -47,20 +61,13 @@ const filterTabs: { id: FilterStatus; label: string }[] = [
     { id: "delivered", label: "Đã giao" },
 ];
 
-// Mock data for dropdown options
-const dateOptions = [
+// Default options when no data provided
+const defaultDateOptions: FilterOption[] = [
     { value: "", label: "Ngày giao hàng" },
-    { value: "2026-01-22", label: "22/01/2026" },
-    { value: "2026-01-23", label: "23/01/2026" },
-    { value: "2026-01-24", label: "24/01/2026" },
-    { value: "2026-01-25", label: "25/01/2026" },
 ];
 
-const branchOptions = [
+const defaultBranchOptions: FilterOption[] = [
     { value: "", label: "Chi nhánh" },
-    { value: "cn1", label: "Chi Nhánh 1" },
-    { value: "cn2", label: "Chi Nhánh 2" },
-    { value: "cn3", label: "Chi Nhánh 3" },
 ];
 
 export default function MobileLayout({
@@ -74,8 +81,13 @@ export default function MobileLayout({
     onDateChange,
     selectedBranch = "",
     onBranchChange,
+    dateOptions = defaultDateOptions,
+    branchOptions = defaultBranchOptions,
+    onClearFilters,
 }: MobileLayoutProps) {
     const pathname = usePathname();
+    const router = useRouter();
+    const { isAuthenticated, user, logout } = useAuth();
     const [isSearchOpen, setIsSearchOpen] = useState(false);
 
     const handleFilterClick = (filter: FilterStatus) => {
@@ -95,6 +107,11 @@ export default function MobileLayout({
 
     const getTabCount = (tabId: FilterStatus) => {
         return orderCounts[tabId];
+    };
+
+    const handleLogout = () => {
+        logout();
+        router.push("/login");
     };
 
     return (
@@ -164,6 +181,23 @@ export default function MobileLayout({
                             <button className={styles.iconButton} aria-label="Làm mới">
                                 <RefreshCw size={20} />
                             </button>
+
+                            {/* Auth Button */}
+                            {isAuthenticated ? (
+                                <button
+                                    className={styles.authButton}
+                                    onClick={handleLogout}
+                                    title={`Đăng xuất (${user?.userName})`}
+                                >
+                                    <LogOut size={18} />
+                                    <span className={styles.authButtonText}>Đăng xuất</span>
+                                </button>
+                            ) : (
+                                <Link href="/login" className={styles.authButton}>
+                                    <LogIn size={18} />
+                                    <span className={styles.authButtonText}>Đăng nhập</span>
+                                </Link>
+                            )}
                         </div>
                     </div>
 
@@ -208,7 +242,7 @@ export default function MobileLayout({
                         <div className={styles.dropdownFilters}>
                             <div className={styles.dropdown}>
                                 <select
-                                    className={styles.dropdownSelect}
+                                    className={`${styles.dropdownSelect} ${selectedDate ? styles.dropdownActive : ""}`}
                                     value={selectedDate}
                                     onChange={(e) => onDateChange?.(e.target.value)}
                                 >
@@ -223,7 +257,7 @@ export default function MobileLayout({
 
                             <div className={styles.dropdown}>
                                 <select
-                                    className={styles.dropdownSelect}
+                                    className={`${styles.dropdownSelect} ${selectedBranch ? styles.dropdownActive : ""}`}
                                     value={selectedBranch}
                                     onChange={(e) => onBranchChange?.(e.target.value)}
                                 >
@@ -235,6 +269,18 @@ export default function MobileLayout({
                                 </select>
                                 <ChevronDown size={16} className={styles.dropdownIcon} />
                             </div>
+
+                            {/* Clear Filters Button - only show when filters active */}
+                            {(selectedDate || selectedBranch) && (
+                                <button
+                                    className={styles.clearFiltersButton}
+                                    onClick={onClearFilters}
+                                    title="Xóa bộ lọc"
+                                >
+                                    <X size={16} />
+                                    <span className={styles.clearFiltersText}>Xóa lọc</span>
+                                </button>
+                            )}
                         </div>
                     </div>
                 </header>
