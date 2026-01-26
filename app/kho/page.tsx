@@ -120,7 +120,7 @@ export default function KhoPage() {
     }
 
     return (
-        <MobileLayout>
+        <MobileLayout onRefresh={fetchItems}>
             <div className={styles.container}>
                 <div className={styles.header}>
                     <div className={styles.titleSection}>

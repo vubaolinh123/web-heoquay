@@ -4,13 +4,16 @@ import { useState, useEffect, useCallback } from "react";
 import { Package, RefreshCw, AlertCircle } from "lucide-react";
 import MobileLayout from "@/components/MobileLayout";
 import { DateCard } from "@/components/GomHang";
+import Toast from "@/components/Toast";
 import { collectOrdersApi, CollectOrderDay } from "@/lib/api";
+import { useAutoRefresh } from "@/hooks";
 import styles from "./page.module.css";
 
 export default function GomHangPage() {
     const [data, setData] = useState<CollectOrderDay[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [showToast, setShowToast] = useState(false);
 
     const fetchData = useCallback(async () => {
         try {
@@ -26,6 +29,29 @@ export default function GomHangPage() {
         }
     }, []);
 
+    // Silent refresh (no loading state)
+    const silentRefresh = useCallback(async () => {
+        try {
+            const result = await collectOrdersApi.getAll();
+            setData(result);
+        } catch (err) {
+            console.error("Silent refresh failed:", err);
+        }
+    }, []);
+
+    // Auto-refresh hook
+    const { countdown, resetCountdown } = useAutoRefresh(silentRefresh, {
+        onSuccess: () => setShowToast(true),
+        enabled: !isLoading,
+    });
+
+    // Manual refresh handler
+    const handleManualRefresh = async () => {
+        await silentRefresh();
+        resetCountdown();
+        setShowToast(true);
+    };
+
     useEffect(() => {
         fetchData();
     }, [fetchData]);
@@ -37,7 +63,7 @@ export default function GomHangPage() {
     );
 
     return (
-        <MobileLayout>
+        <MobileLayout onRefresh={handleManualRefresh} refreshCountdown={countdown}>
             <div className={styles.container}>
                 {/* Page Header */}
                 <div className={styles.pageHeader}>
@@ -52,7 +78,7 @@ export default function GomHangPage() {
                     </div>
                     <button
                         className={styles.refreshBtn}
-                        onClick={fetchData}
+                        onClick={handleManualRefresh}
                         disabled={isLoading}
                     >
                         <RefreshCw size={18} className={isLoading ? styles.spinning : ""} />
@@ -120,6 +146,13 @@ export default function GomHangPage() {
                     </div>
                 )}
             </div>
+
+            {/* Toast notification */}
+            <Toast
+                message="Đã làm mới dữ liệu gom hàng"
+                isVisible={showToast}
+                onClose={() => setShowToast(false)}
+            />
         </MobileLayout>
     );
 }

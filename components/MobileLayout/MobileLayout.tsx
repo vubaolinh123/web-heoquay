@@ -46,6 +46,10 @@ interface MobileLayoutProps {
     branchOptions?: FilterOption[];
     // Clear all dropdown filters
     onClearFilters?: () => void;
+    // Refresh callback for page-specific refresh
+    onRefresh?: () => Promise<void> | void;
+    // Countdown seconds until next auto-refresh
+    refreshCountdown?: number;
 }
 
 const navItems = [
@@ -84,11 +88,24 @@ export default function MobileLayout({
     dateOptions = defaultDateOptions,
     branchOptions = defaultBranchOptions,
     onClearFilters,
+    onRefresh,
+    refreshCountdown,
 }: MobileLayoutProps) {
     const pathname = usePathname();
     const router = useRouter();
     const { isAuthenticated, user, logout } = useAuth();
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
+    const handleRefresh = async () => {
+        if (isRefreshing || !onRefresh) return;
+        setIsRefreshing(true);
+        try {
+            await onRefresh();
+        } finally {
+            setIsRefreshing(false);
+        }
+    };
 
     const handleFilterClick = (filter: FilterStatus) => {
         onFilterChange?.(filter);
@@ -178,9 +195,23 @@ export default function MobileLayout({
                             >
                                 {isSearchOpen ? <X size={20} /> : <Search size={20} />}
                             </button>
-                            <button className={styles.iconButton} aria-label="Làm mới">
-                                <RefreshCw size={20} />
-                            </button>
+                            {/* Refresh button with countdown */}
+                            <div className={styles.refreshContainer}>
+                                {refreshCountdown !== undefined && refreshCountdown > 0 && (
+                                    <span className={styles.refreshCountdown}>
+                                        {Math.floor(refreshCountdown / 60)}:{(refreshCountdown % 60).toString().padStart(2, "0")}
+                                    </span>
+                                )}
+                                <button
+                                    className={`${styles.iconButton} ${isRefreshing ? styles.iconButtonSpinning : ""}`}
+                                    aria-label="Làm mới"
+                                    onClick={handleRefresh}
+                                    disabled={isRefreshing || !onRefresh}
+                                    title={refreshCountdown ? `Tự động làm mới sau ${Math.floor(refreshCountdown / 60)}:${(refreshCountdown % 60).toString().padStart(2, "0")}` : "Làm mới"}
+                                >
+                                    <RefreshCw size={20} />
+                                </button>
+                            </div>
 
                             {/* Auth Button */}
                             {isAuthenticated ? (

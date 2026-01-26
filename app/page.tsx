@@ -8,7 +8,9 @@ import OrderCard from "@/components/OrderCard";
 import OrderDetailModal from "@/components/OrderDetailModal";
 import StickyDayHeader from "@/components/StickyDayHeader";
 import { KitchenSlipModal, ReportModal } from "@/components/Print";
+import Toast from "@/components/Toast";
 import { ordersApi, transformApiOrder, groupOrdersByDate } from "@/lib/api";
+import { useAutoRefresh } from "@/hooks";
 import { formatTien } from "@/lib/mockData";
 import { DonHang, DonHangTheoNgay } from "@/lib/types";
 import styles from "./page.module.css";
@@ -25,6 +27,9 @@ export default function HomePage() {
   // API State
   const [allOrdersGroupedByDay, setAllOrdersGroupedByDay] = useState<DonHangTheoNgay[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Toast state for auto-refresh notification
+  const [showToast, setShowToast] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Date and Branch filter state - initialize from URL query
@@ -66,6 +71,32 @@ export default function HomePage() {
       setIsLoading(false);
     }
   }, []);
+
+  // Silent refresh for auto-refresh (no loading state)
+  const silentRefresh = useCallback(async () => {
+    try {
+      const apiOrders = await ordersApi.getOrders();
+      const transformedOrders = apiOrders.map(transformApiOrder);
+      const groupedOrders = groupOrdersByDate(transformedOrders);
+      setAllOrdersGroupedByDay(groupedOrders);
+    } catch (err) {
+      console.error("Silent refresh failed:", err);
+      // Don't show error for background refresh
+    }
+  }, []);
+
+  // Auto-refresh hook - refresh every 5 minutes (configurable)
+  const { countdown, resetCountdown } = useAutoRefresh(silentRefresh, {
+    onSuccess: () => setShowToast(true),
+    enabled: !isLoading, // Only enable after initial load
+  });
+
+  // Manual refresh handler (for header button)
+  const handleManualRefresh = useCallback(async () => {
+    await silentRefresh();
+    resetCountdown();
+    setShowToast(true);
+  }, [silentRefresh, resetCountdown]);
 
   // Initial data fetch
   useEffect(() => {
@@ -345,6 +376,8 @@ export default function HomePage() {
       dateOptions={dateOptions}
       branchOptions={branchOptions}
       onClearFilters={handleClearFilters}
+      onRefresh={handleManualRefresh}
+      refreshCountdown={countdown}
     >
       {/* Sticky Day Header */}
       {currentVisibleDay && (
@@ -438,6 +471,13 @@ export default function HomePage() {
           orders={printModalData.orders}
         />
       )}
+
+      {/* Toast notification for auto-refresh */}
+      <Toast
+        message="Đã làm mới đơn hàng"
+        isVisible={showToast}
+        onClose={() => setShowToast(false)}
+      />
     </MobileLayout>
   );
 }

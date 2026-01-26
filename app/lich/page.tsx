@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { CalendarViewMode, DonHang } from "@/lib/types";
 import { useOrders } from "@/contexts";
+import { useAutoRefresh } from "@/hooks";
 import MobileLayout from "@/components/MobileLayout";
 import CalendarHeader from "@/components/Calendar/CalendarHeader";
+import Toast from "@/components/Toast";
 import styles from "./page.module.css";
 
 // Dynamic imports for view components
@@ -27,6 +29,22 @@ export default function LichPage() {
 
     const [viewMode, setViewMode] = useState<CalendarViewMode>("week");
     const [currentDate, setCurrentDate] = useState(new Date()); // Start with today
+
+    // Toast state for auto-refresh notification
+    const [showToast, setShowToast] = useState(false);
+
+    // Auto-refresh hook - refresh every 5 minutes (configurable)
+    const { countdown, resetCountdown } = useAutoRefresh(refetch, {
+        onSuccess: () => setShowToast(true),
+        enabled: !isLoading, // Only enable after initial load
+    });
+
+    // Manual refresh handler (for header button)
+    const handleManualRefresh = async () => {
+        await refetch();
+        resetCountdown();
+        setShowToast(true);
+    };
 
     // Get orders for current day (for DayView)
     const dayOrders = useMemo(() => {
@@ -93,7 +111,7 @@ export default function LichPage() {
     }
 
     return (
-        <MobileLayout>
+        <MobileLayout onRefresh={handleManualRefresh} refreshCountdown={countdown}>
             <div className={styles.container}>
                 <CalendarHeader
                     viewMode={viewMode}
@@ -114,6 +132,13 @@ export default function LichPage() {
                     )}
                 </div>
             </div>
+
+            {/* Toast notification for auto-refresh */}
+            <Toast
+                message="Đã làm mới lịch"
+                isVisible={showToast}
+                onClose={() => setShowToast(false)}
+            />
         </MobileLayout>
     );
 }

@@ -11,9 +11,6 @@ export async function GET(request: Request) {
         // Get token from request (passed from client with their login token)
         const token = getTokenFromRequest(request);
 
-        console.log("=== Orders API ===");
-        console.log("Token from client:", token ? `${token.substring(0, 30)}...` : "NONE");
-
         if (!token) {
             return NextResponse.json(
                 { error: "1", message: "Unauthorized - Please login" },

@@ -94,14 +94,56 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.iconButton:hover {
+.iconButton:hover:not(:disabled) {
   background-color: rgba(255, 255, 255, 0.25);
   transform: scale(1.05);
 }
 
-.iconButton:active {
+.iconButton:active:not(:disabled) {
   background-color: rgba(255, 255, 255, 0.35);
   transform: scale(0.98);
+}
+
+.iconButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.iconButtonSpinning svg {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Refresh Container with Countdown */
+.refreshContainer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.refreshCountdown {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.15);
+  padding: 4px 8px;
+  border-radius: var(--radius-md);
+  min-width: 36px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Smaller countdown on mobile */
+@media (max-width: 480px) {
+  .refreshCountdown {
+    font-size: 9px;
+    padding: 3px 6px;
+    min-width: 30px;
+  }
 }
 
 /* Auth Button */
