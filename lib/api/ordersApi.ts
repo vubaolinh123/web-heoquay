@@ -50,22 +50,27 @@ export const ordersApi = {
      * @throws Error if API returns error or network fails
      */
     updateOrderStatus: async (orderId: string, status: string): Promise<boolean> => {
-        const response = await fetch(
-            "https://asia-82692522.n8nhosting.cloud/webhook/api/v1/heoquay/orders/update-status",
-            {
+        try {
+            // Use Next.js API route as proxy to avoid CORS issues
+            const response = await fetch("/api/orders/update-status", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({ orderId, status }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "Không thể cập nhật trạng thái");
             }
-        );
 
-        if (!response.ok) {
-            const data = await response.json().catch(() => ({}));
-            throw new Error(data.message || "Không thể cập nhật trạng thái");
+            console.log("Update status result:", data);
+            return true;
+        } catch (error) {
+            console.error("Update status error:", error);
+            throw error;
         }
-
-        return true;
     },
 };

@@ -104,12 +104,19 @@ export default function KitchenSlipModal({
         0
     );
 
-    // Product summary
+    // Product summary (exclude "Phí ship")
     const productSummary: Record<string, number> = {};
+    let totalProductsInSummary = 0;
     orders.forEach((order) => {
         order.sanPhams.forEach((product) => {
-            const key = `${product.ten} ${product.kichThuoc} ${product.maHang}`;
+            // Skip "Phí ship" products
+            const productNameLower = product.ten.toLowerCase();
+            if (productNameLower.includes("phí ship") || productNameLower.includes("phi ship")) {
+                return;
+            }
+            const key = `${product.ten} ${product.kichThuoc || ""} ${product.maHang || ""}`.trim();
             productSummary[key] = (productSummary[key] || 0) + product.soLuong;
+            totalProductsInSummary += product.soLuong;
         });
     });
 
@@ -232,6 +239,10 @@ export default function KitchenSlipModal({
                                     <span>{qty}</span>
                                 </div>
                             ))}
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', padding: '8px 0 4px', borderTop: '1px solid #1e293b', marginTop: '8px', fontWeight: 700 }}>
+                                <span>TỔNG CỘNG</span>
+                                <span>{totalProductsInSummary} sản phẩm</span>
+                            </div>
                         </div>
 
                         <div style={{ border: '1px solid #1e293b', padding: '16px' }}>
