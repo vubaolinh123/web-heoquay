@@ -1,10 +1,11 @@
 import { CollectOrderDay } from "@/lib/api/collectOrdersApi";
-import { Calendar, CalendarDays, Package } from "lucide-react";
+import { Calendar, CalendarDays, Package, Building2 } from "lucide-react";
 import ItemRow from "../ItemRow";
 import styles from "./DateCard.module.css";
 
 interface DateCardProps {
     data: CollectOrderDay;
+    branch?: string;
 }
 
 /**
@@ -28,10 +29,11 @@ function getTotalItems(items: CollectOrderDay["danhSachHang"]): number {
     return items.reduce((sum, item) => sum + item.tongSoLuong, 0);
 }
 
-export default function DateCard({ data }: DateCardProps) {
+export default function DateCard({ data, branch }: DateCardProps) {
     const { day, monthYear } = formatDate(data.ngayGiaoHang);
     const totalItems = getTotalItems(data.danhSachHang);
     const totalProducts = data.danhSachHang.length;
+    const displayBranch = branch || data.chiNhanh;
 
     return (
         <div className={styles.card}>
@@ -42,9 +44,17 @@ export default function DateCard({ data }: DateCardProps) {
                     <span className={styles.day}>{day}</span>
                     <span className={styles.monthYear}>/ {monthYear}</span>
                 </div>
-                <div className={styles.dateLunar}>
-                    <CalendarDays size={14} />
-                    <span>{data.ngayAm}</span>
+                <div className={styles.headerRight}>
+                    {displayBranch && (
+                        <div className={styles.branchBadge}>
+                            <Building2 size={12} />
+                            <span>{displayBranch}</span>
+                        </div>
+                    )}
+                    <div className={styles.dateLunar}>
+                        <CalendarDays size={14} />
+                        <span>{data.ngayAm}</span>
+                    </div>
                 </div>
             </div>
 

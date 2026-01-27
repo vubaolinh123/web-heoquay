@@ -14,7 +14,7 @@ export interface KhachHang {
     diaChi: string;        // Address
 }
 
-export type TrangThaiDon = "chua_giao" | "da_giao" | "dang_giao";
+export type TrangThaiDon = "Chưa giao" | "Đang giao" | "Đã giao" | "Đã hủy";
 
 export interface DonHang {
     id: string;

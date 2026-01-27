@@ -15,11 +15,13 @@ import {
     LogIn,
     LogOut,
     User,
+    PanelLeftClose,
+    PanelLeft,
 } from "lucide-react";
 import { useAuth } from "@/contexts";
 import styles from "./MobileLayout.module.css";
 
-export type FilterStatus = "all" | "pending" | "delivered";
+export type FilterStatus = "all" | "Chưa giao" | "Đang giao" | "Đã giao" | "Đã hủy";
 
 export interface FilterOption {
     value: string;
@@ -35,15 +37,20 @@ interface MobileLayoutProps {
     orderCounts?: {
         all: number;
         pending: number;
+        inProgress: number;
         delivered: number;
+        cancelled: number;
     };
     selectedDate?: string;
     onDateChange?: (date: string) => void;
     selectedBranch?: string;
     onBranchChange?: (branch: string) => void;
+    selectedDeliveryMethod?: string;
+    onDeliveryMethodChange?: (method: string) => void;
     // Dynamic filter options from API data
     dateOptions?: FilterOption[];
     branchOptions?: FilterOption[];
+    deliveryMethodOptions?: FilterOption[];
     // Clear all dropdown filters
     onClearFilters?: () => void;
     // Refresh callback for page-specific refresh
@@ -61,8 +68,10 @@ const navItems = [
 
 const filterTabs: { id: FilterStatus; label: string }[] = [
     { id: "all", label: "Tất cả" },
-    { id: "pending", label: "Chưa giao" },
-    { id: "delivered", label: "Đã giao" },
+    { id: "Chưa giao", label: "Chưa giao" },
+    { id: "Đang giao", label: "Đang giao" },
+    { id: "Đã giao", label: "Đã giao" },
+    { id: "Đã hủy", label: "Đã hủy" },
 ];
 
 // Default options when no data provided
@@ -74,19 +83,26 @@ const defaultBranchOptions: FilterOption[] = [
     { value: "", label: "Chi nhánh" },
 ];
 
+const defaultDeliveryMethodOptions: FilterOption[] = [
+    { value: "", label: "Hình thức giao" },
+];
+
 export default function MobileLayout({
     children,
     activeFilter = "all",
     onFilterChange,
     searchQuery = "",
     onSearchChange,
-    orderCounts = { all: 0, pending: 0, delivered: 0 },
+    orderCounts = { all: 0, pending: 0, inProgress: 0, delivered: 0, cancelled: 0 },
     selectedDate = "",
     onDateChange,
     selectedBranch = "",
     onBranchChange,
     dateOptions = defaultDateOptions,
     branchOptions = defaultBranchOptions,
+    deliveryMethodOptions = defaultDeliveryMethodOptions,
+    selectedDeliveryMethod = "",
+    onDeliveryMethodChange,
     onClearFilters,
     onRefresh,
     refreshCountdown,
@@ -96,6 +112,11 @@ export default function MobileLayout({
     const { isAuthenticated, user, logout } = useAuth();
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
+    const toggleSidebar = () => {
+        setIsSidebarCollapsed(!isSidebarCollapsed);
+    };
 
     const handleRefresh = async () => {
         if (isRefreshing || !onRefresh) return;
@@ -123,7 +144,14 @@ export default function MobileLayout({
     };
 
     const getTabCount = (tabId: FilterStatus) => {
-        return orderCounts[tabId];
+        switch (tabId) {
+            case "all": return orderCounts.all;
+            case "Chưa giao": return orderCounts.pending;
+            case "Đang giao": return orderCounts.inProgress;
+            case "Đã giao": return orderCounts.delivered;
+            case "Đã hủy": return orderCounts.cancelled;
+            default: return 0;
+        }
     };
 
     const handleLogout = () => {
@@ -134,15 +162,7 @@ export default function MobileLayout({
     return (
         <div className={styles.layout}>
             {/* Sidebar for Desktop */}
-            <aside className={styles.sidebar}>
-                <div className={styles.sidebarLogo}>
-                    <img
-                        src="/logo.png"
-                        alt="Ngọc Hải"
-                        className={styles.sidebarLogoImg}
-                    />
-                    <span className={styles.sidebarLogoText}>Ngọc Hải</span>
-                </div>
+            <aside className={`${styles.sidebar} ${isSidebarCollapsed ? styles.sidebarCollapsed : ""}`}>
                 <nav className={styles.sidebarNav}>
                     {navItems.map((item) => {
                         const Icon = item.icon;
@@ -151,15 +171,27 @@ export default function MobileLayout({
                             <Link
                                 key={item.href}
                                 href={item.href}
-                                className={`${styles.sidebarNavItem} ${isActive ? styles.sidebarNavItemActive : ""
-                                    }`}
+                                className={`${styles.sidebarNavItem} ${isActive ? styles.sidebarNavItemActive : ""}`}
+                                title={item.label}
                             >
-                                <Icon size={20} />
-                                <span>{item.label}</span>
+                                <span className={styles.navIcon}>
+                                    <Icon size={20} />
+                                </span>
+                                <span className={styles.navLabel}>{item.label}</span>
                             </Link>
                         );
                     })}
                 </nav>
+
+                {/* Toggle Button at Bottom */}
+                <button
+                    className={styles.collapseBtn}
+                    onClick={toggleSidebar}
+                    title={isSidebarCollapsed ? "Mở rộng" : "Thu gọn"}
+                >
+                    {isSidebarCollapsed ? <PanelLeft size={18} /> : <PanelLeftClose size={18} />}
+                    <span className={styles.navLabel}>{isSidebarCollapsed ? "" : "Thu gọn"}</span>
+                </button>
             </aside>
 
             {/* Content Wrapper */}
@@ -301,8 +333,23 @@ export default function MobileLayout({
                                 <ChevronDown size={16} className={styles.dropdownIcon} />
                             </div>
 
+                            <div className={styles.dropdown}>
+                                <select
+                                    className={`${styles.dropdownSelect} ${selectedDeliveryMethod ? styles.dropdownActive : ""}`}
+                                    value={selectedDeliveryMethod}
+                                    onChange={(e) => onDeliveryMethodChange?.(e.target.value)}
+                                >
+                                    {deliveryMethodOptions.map((opt) => (
+                                        <option key={opt.value} value={opt.value}>
+                                            {opt.label}
+                                        </option>
+                                    ))}
+                                </select>
+                                <ChevronDown size={16} className={styles.dropdownIcon} />
+                            </div>
+
                             {/* Clear Filters Button - only show when filters active */}
-                            {(selectedDate || selectedBranch) && (
+                            {(selectedDate || selectedBranch || selectedDeliveryMethod) && (
                                 <button
                                     className={styles.clearFiltersButton}
                                     onClick={onClearFilters}

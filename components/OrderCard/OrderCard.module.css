@@ -61,13 +61,47 @@
 }
 
 .statusPending {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.statusInProgress {
   background-color: #dbeafe;
   color: #2563eb;
 }
 
-.statusInProgress {
-  background-color: #fef3c7;
-  color: #d97706;
+.statusCancelled {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+/* Delivery method styles */
+.statusDelivery {
+  background-color: #dbeafe;
+  color: #2563eb;
+}
+
+.statusPickup {
+  background-color: #f3e8ff;
+  color: #9333ea;
+}
+
+/* === Branch Row === */
+.branchRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--font-size-xs);
+  color: #6366f1;
+}
+
+.branchIcon {
+  flex-shrink: 0;
+  color: #6366f1;
+}
+
+.branchName {
+  font-weight: 500;
 }
 
 /* === Row 2: Customer Name + Phone === */
@@ -298,4 +332,120 @@
   .priceRow {
     min-width: 180px;
   }
+}
+
+/* ===== Status Dropdown ===== */
+.statusDropdownContainer {
+  position: relative;
+}
+
+.statusButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 90px;
+  justify-content: center;
+}
+
+.statusButton:hover:not(:disabled) {
+  filter: brightness(0.95);
+  transform: scale(1.02);
+}
+
+.statusButton:disabled {
+  cursor: wait;
+  opacity: 0.8;
+}
+
+.dropdownIcon {
+  transition: transform 0.2s ease;
+}
+
+.statusDropdownContainer:has(.statusDropdown) .dropdownIcon {
+  transform: rotate(180deg);
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.statusDropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 100;
+  min-width: 130px;
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  animation: dropdownFadeIn 0.15s ease-out;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.statusOption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  background: transparent;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
+}
+
+.statusOption:hover {
+  filter: brightness(0.95);
+}
+
+.statusOption.statusPending {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.statusOption.statusInProgress {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.statusOption.statusDelivered {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.statusOption.statusCancelled {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.statusOptionActive {
+  position: relative;
+}
+
+.statusOption:not(:last-child) {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }

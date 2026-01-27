@@ -1,4 +1,4 @@
-import { DonHang, DonHangTheoNgay, SanPham } from "../types";
+import { DonHang, DonHangTheoNgay, SanPham, TrangThaiDon } from "../types";
 import { ApiOrder, ApiOrderItem } from "./types";
 
 // ===========================================
@@ -179,7 +179,7 @@ export function transformApiOrder(apiOrder: ApiOrder): DonHang {
         sanPhams: danhSachHang.map(transformOrderItem),
         tongTien: apiOrder.tongTien || 0,
         phiShip,
-        trangThai: "chua_giao", // Default status since API doesn't provide it
+        trangThai: (apiOrder.trangThai as TrangThaiDon) || "Chưa giao",
         phuongThucThanhToan: apiOrder.phuongThucThanhToan === "Tiền mặt"
             ? "tien_mat"
             : "chuyen_khoan",

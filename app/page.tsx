@@ -35,6 +35,7 @@ export default function HomePage() {
   // Date and Branch filter state - initialize from URL query
   const [selectedDate, setSelectedDate] = useState(() => searchParams.get("date") || "");
   const [selectedBranch, setSelectedBranch] = useState("");
+  const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState("");
 
   // Sync selectedDate when URL changes
   useEffect(() => {
@@ -109,10 +110,8 @@ export default function HomePage() {
       let filteredOrders = day.donHangs;
 
       // Apply status filter
-      if (activeFilter === "pending") {
-        filteredOrders = filteredOrders.filter((d) => d.trangThai === "chua_giao");
-      } else if (activeFilter === "delivered") {
-        filteredOrders = filteredOrders.filter((d) => d.trangThai === "da_giao");
+      if (activeFilter !== "all") {
+        filteredOrders = filteredOrders.filter((d) => d.trangThai === activeFilter);
       }
 
       // Apply search filter
@@ -141,6 +140,13 @@ export default function HomePage() {
         );
       }
 
+      // Apply delivery method filter
+      if (selectedDeliveryMethod) {
+        filteredOrders = filteredOrders.filter(
+          (d) => d.hinhThucGiao === selectedDeliveryMethod
+        );
+      }
+
       return {
         ...day,
         donHangs: filteredOrders,
@@ -148,15 +154,17 @@ export default function HomePage() {
         tongDoanhThu: filteredOrders.reduce((sum, d) => sum + d.tongTien, 0),
       };
     }).filter((day) => day.donHangs.length > 0);
-  }, [allOrdersGroupedByDay, activeFilter, searchQuery, selectedDate, selectedBranch]);
+  }, [allOrdersGroupedByDay, activeFilter, searchQuery, selectedDate, selectedBranch, selectedDeliveryMethod]);
 
   // Calculate order counts for tabs
   const orderCounts = useMemo(() => {
     const allOrders = allOrdersGroupedByDay.flatMap((d) => d.donHangs);
     return {
       all: allOrders.length,
-      pending: allOrders.filter((d) => d.trangThai === "chua_giao").length,
-      delivered: allOrders.filter((d) => d.trangThai === "da_giao").length,
+      pending: allOrders.filter((d) => d.trangThai === "Chưa giao").length,
+      inProgress: allOrders.filter((d) => d.trangThai === "Đang giao").length,
+      delivered: allOrders.filter((d) => d.trangThai === "Đã giao").length,
+      cancelled: allOrders.filter((d) => d.trangThai === "Đã hủy").length,
     };
   }, [allOrdersGroupedByDay]);
 
@@ -202,6 +210,27 @@ export default function HomePage() {
     const options: FilterOption[] = [{ value: "", label: "Chi nhánh" }];
     sortedBranches.forEach((branch) => {
       options.push({ value: branch, label: branch });
+    });
+
+    return options;
+  }, [allOrdersGroupedByDay]);
+
+  // Generate dynamic delivery method options from API data
+  const deliveryMethodOptions = useMemo<FilterOption[]>(() => {
+    const allOrders = allOrdersGroupedByDay.flatMap((d) => d.donHangs);
+    const uniqueMethods = new Set<string>();
+
+    allOrders.forEach((order) => {
+      if (order.hinhThucGiao) {
+        uniqueMethods.add(order.hinhThucGiao);
+      }
+    });
+
+    const sortedMethods = Array.from(uniqueMethods).sort();
+
+    const options: FilterOption[] = [{ value: "", label: "Hình thức giao" }];
+    sortedMethods.forEach((method) => {
+      options.push({ value: method, label: method });
     });
 
     return options;
@@ -318,10 +347,11 @@ export default function HomePage() {
     setPrintModalData(null);
   };
 
-  // Clear date and branch filters
+  // Clear date, branch and delivery method filters
   const handleClearFilters = useCallback(() => {
     setSelectedDate("");
     setSelectedBranch("");
+    setSelectedDeliveryMethod("");
   }, []);
 
   // Loading state
@@ -332,7 +362,7 @@ export default function HomePage() {
         onFilterChange={setActiveFilter}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        orderCounts={{ all: 0, pending: 0, delivered: 0 }}
+        orderCounts={{ all: 0, pending: 0, inProgress: 0, delivered: 0, cancelled: 0 }}
       >
         <div className={styles.loadingState}>
           <div className={styles.spinner}></div>
@@ -350,7 +380,7 @@ export default function HomePage() {
         onFilterChange={setActiveFilter}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        orderCounts={{ all: 0, pending: 0, delivered: 0 }}
+        orderCounts={{ all: 0, pending: 0, inProgress: 0, delivered: 0, cancelled: 0 }}
       >
         <div className={styles.errorState}>
           <p className={styles.errorMessage}>⚠️ {error}</p>
@@ -375,6 +405,9 @@ export default function HomePage() {
       onBranchChange={setSelectedBranch}
       dateOptions={dateOptions}
       branchOptions={branchOptions}
+      deliveryMethodOptions={deliveryMethodOptions}
+      selectedDeliveryMethod={selectedDeliveryMethod}
+      onDeliveryMethodChange={setSelectedDeliveryMethod}
       onClearFilters={handleClearFilters}
       onRefresh={handleManualRefresh}
       refreshCountdown={countdown}

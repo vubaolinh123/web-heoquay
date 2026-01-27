@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
-import { X, Phone, MapPin, Calendar, Clock, Printer, FileText } from "lucide-react";
-import { DonHang } from "@/lib/types";
+import { useEffect, useState } from "react";
+import { X, Phone, MapPin, Calendar, Clock, Building2, Loader2 } from "lucide-react";
+import { DonHang, TrangThaiDon } from "@/lib/types";
 import { formatTien } from "@/lib/mockData";
+import { ordersApi } from "@/lib/api";
 import styles from "./OrderDetailModal.module.css";
 
 interface OrderDetailModalProps {
@@ -11,14 +12,28 @@ interface OrderDetailModalProps {
     onClose: () => void;
     onPrintKitchen?: () => void;
     onPrintInvoice?: () => void;
+    onStatusUpdate?: (orderId: string, newStatus: TrangThaiDon) => void;
 }
+
+// Status options
+const STATUS_OPTIONS: { value: TrangThaiDon; label: string; color: string }[] = [
+    { value: "Chưa giao", label: "Chưa giao", color: "#d97706" },
+    { value: "Đang giao", label: "Đang giao", color: "#2563eb" },
+    { value: "Đã giao", label: "Đã giao", color: "#16a34a" },
+    { value: "Đã hủy", label: "Đã hủy", color: "#dc2626" },
+];
 
 export default function OrderDetailModal({
     donHang,
     onClose,
     onPrintKitchen,
     onPrintInvoice,
+    onStatusUpdate,
 }: OrderDetailModalProps) {
+    const [currentStatus, setCurrentStatus] = useState<TrangThaiDon>(donHang.trangThai);
+    const [isUpdating, setIsUpdating] = useState(false);
+    const [updateError, setUpdateError] = useState<string | null>(null);
+
     // Prevent body scroll when modal is open
     useEffect(() => {
         document.body.style.overflow = "hidden";
@@ -43,6 +58,34 @@ export default function OrderDetailModal({
         year: "numeric",
     });
 
+    // Handle status change
+    const handleStatusChange = async (newStatus: TrangThaiDon) => {
+        if (newStatus === currentStatus || isUpdating) return;
+
+        setIsUpdating(true);
+        setUpdateError(null);
+
+        try {
+            await ordersApi.updateOrderStatus(donHang.maDon, newStatus);
+            setCurrentStatus(newStatus);
+            onStatusUpdate?.(donHang.maDon, newStatus);
+        } catch (error) {
+            setUpdateError(error instanceof Error ? error.message : "Có lỗi xảy ra");
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
+    // Get status class
+    const getStatusClass = (status: TrangThaiDon) => {
+        switch (status) {
+            case "Đã giao": return styles.statusDelivered;
+            case "Đang giao": return styles.statusInProgress;
+            case "Đã hủy": return styles.statusCancelled;
+            default: return styles.statusPending;
+        }
+    };
+
     return (
         <div className={styles.overlay} onClick={onClose}>
             <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
@@ -58,18 +101,26 @@ export default function OrderDetailModal({
                 <div className={styles.modalContent}>
                     {/* Status Section */}
                     <div className={styles.section}>
-                        <div className={styles.sectionTitle}>Trạng thái</div>
+                        <div className={styles.sectionTitle}>
+                            Trạng thái
+                            {isUpdating && <Loader2 size={14} className={styles.loadingSpinner} />}
+                        </div>
                         <div className={styles.sectionContent}>
-                            <div className={styles.statusRow}>
-                                <span
-                                    className={`${styles.statusBadge} ${donHang.trangThai === "da_giao"
-                                            ? styles.statusDelivered
-                                            : styles.statusPending
-                                        }`}
-                                >
-                                    {donHang.trangThai === "da_giao" ? "Đã giao" : "Chưa giao"}
-                                </span>
+                            <div className={styles.statusButtons}>
+                                {STATUS_OPTIONS.map((option) => (
+                                    <button
+                                        key={option.value}
+                                        className={`${styles.statusButton} ${currentStatus === option.value ? styles.statusButtonActive : ""} ${getStatusClass(option.value)}`}
+                                        onClick={() => handleStatusChange(option.value)}
+                                        disabled={isUpdating}
+                                    >
+                                        {option.label}
+                                    </button>
+                                ))}
                             </div>
+                            {updateError && (
+                                <div className={styles.errorMessage}>{updateError}</div>
+                            )}
                         </div>
                     </div>
 
@@ -118,6 +169,13 @@ export default function OrderDetailModal({
                                     <span className={styles.infoLabel}>Giờ:</span>
                                     <span className={styles.infoValue}>{donHang.thoiGian}</span>
                                 </div>
+                                {donHang.chiNhanh && (
+                                    <div className={styles.infoRow}>
+                                        <Building2 size={16} className={styles.infoIcon} />
+                                        <span className={styles.infoLabel}>Chi nhánh:</span>
+                                        <span className={styles.infoValue}>{donHang.chiNhanh}</span>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -193,24 +251,6 @@ export default function OrderDetailModal({
                             </div>
                         </div>
                     )}
-                </div>
-
-                {/* Footer Actions */}
-                <div className={styles.modalFooter}>
-                    <button
-                        className={`${styles.actionButton} ${styles.secondaryButton}`}
-                        onClick={onPrintKitchen}
-                    >
-                        <Printer size={18} />
-                        In phiếu bếp
-                    </button>
-                    <button
-                        className={`${styles.actionButton} ${styles.primaryButton}`}
-                        onClick={onPrintInvoice}
-                    >
-                        <FileText size={18} />
-                        Xuất hóa đơn
-                    </button>
                 </div>
             </div>
         </div>

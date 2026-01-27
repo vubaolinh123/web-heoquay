@@ -97,8 +97,8 @@ export default function KitchenSlipModal({
     };
 
     // Calculate summary
-    const pendingOrders = orders.filter((o) => o.trangThai === "chua_giao" || o.trangThai === "dang_giao");
-    const deliveredOrders = orders.filter((o) => o.trangThai === "da_giao");
+    const pendingOrders = orders.filter((o) => o.trangThai === "Chưa giao" || o.trangThai === "Đang giao");
+    const deliveredOrders = orders.filter((o) => o.trangThai === "Đã giao");
     const totalProducts = orders.reduce(
         (sum, o) => sum + o.sanPhams.reduce((s, p) => s + p.soLuong, 0),
         0
@@ -172,7 +172,7 @@ export default function KitchenSlipModal({
                                     <td style={{ border: '1px solid #1e293b', padding: '8px 10px', textAlign: 'center', verticalAlign: 'top' }}>
                                         <span style={{ display: 'block', fontWeight: 700, fontSize: '14px' }}>{order.gioGiao || order.thoiGian}</span>
                                         <span style={{ display: 'block', fontSize: '11px', color: '#64748b' }}>
-                                            {order.trangThai === "da_giao" ? "ĐÃ GIAO" : "GIAO HÀNG"}
+                                            {order.trangThai === "Đã giao" ? "ĐÃ GIAO" : order.trangThai?.toUpperCase() || "GIAO HÀNG"}
                                         </span>
                                     </td>
                                     <td style={{ border: '1px solid #1e293b', padding: '8px 10px', verticalAlign: 'top' }}>

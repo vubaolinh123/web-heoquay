@@ -31,7 +31,7 @@ export const mockDonHangs: DonHang[] = [
         ],
         tongTien: 6400000,
         phiShip: 0,
-        trangThai: "chua_giao",
+        trangThai: "Chưa giao",
         phuongThucThanhToan: "tien_mat",
         diaChiGiao: "Ks nha trang lodge, 42 trần phú",
         ngayGiao: new Date(2026, 0, 23),
@@ -59,7 +59,7 @@ export const mockDonHangs: DonHang[] = [
         ],
         tongTien: 17000,
         phiShip: 17000,
-        trangThai: "chua_giao",
+        trangThai: "Chưa giao",
         phuongThucThanhToan: "tien_mat",
     },
     {
@@ -92,7 +92,7 @@ export const mockDonHangs: DonHang[] = [
         ],
         tongTien: 3250000,
         phiShip: 50000,
-        trangThai: "da_giao",
+        trangThai: "Đã giao",
         phuongThucThanhToan: "tien_mat",
     },
     // Thứ 7 - 24/01/2026
@@ -119,7 +119,7 @@ export const mockDonHangs: DonHang[] = [
         ],
         tongTien: 3000000,
         phiShip: 0,
-        trangThai: "da_giao",
+        trangThai: "Đã giao",
         phuongThucThanhToan: "tien_mat",
     },
     {
@@ -144,7 +144,7 @@ export const mockDonHangs: DonHang[] = [
         ],
         tongTien: 2400000,
         phiShip: 0,
-        trangThai: "chua_giao",
+        trangThai: "Chưa giao",
         phuongThucThanhToan: "chuyen_khoan",
     },
     {
@@ -176,7 +176,7 @@ export const mockDonHangs: DonHang[] = [
         ],
         tongTien: 6800000,
         phiShip: 100000,
-        trangThai: "chua_giao",
+        trangThai: "Chưa giao",
         phuongThucThanhToan: "tien_mat",
     },
     {
@@ -201,7 +201,7 @@ export const mockDonHangs: DonHang[] = [
         ],
         tongTien: 3200000,
         phiShip: 0,
-        trangThai: "chua_giao",
+        trangThai: "Chưa giao",
         phuongThucThanhToan: "tien_mat",
     },
     {
@@ -226,7 +226,7 @@ export const mockDonHangs: DonHang[] = [
         ],
         tongTien: 8100000,
         phiShip: 0,
-        trangThai: "da_giao",
+        trangThai: "Đã giao",
         phuongThucThanhToan: "chuyen_khoan",
     },
     {
@@ -258,7 +258,7 @@ export const mockDonHangs: DonHang[] = [
         ],
         tongTien: 2542000,
         phiShip: 42000,
-        trangThai: "chua_giao",
+        trangThai: "Chưa giao",
         phuongThucThanhToan: "tien_mat",
     },
     // More orders for January 2026
@@ -271,7 +271,7 @@ export const mockDonHangs: DonHang[] = [
         ngayAm: "Âm 30/11",
         khachHang: { ten: "MỸ LIỀN", soDienThoai: "912345678", diaChi: "123 ABC" },
         sanPhams: [{ id: "sp20", ten: "Heo Nguyên Con", kichThuoc: "6kg", soLuong: 1, maHang: "#H6" }],
-        tongTien: 2400000, phiShip: 0, trangThai: "da_giao", phuongThucThanhToan: "tien_mat",
+        tongTien: 2400000, phiShip: 0, trangThai: "Đã giao", phuongThucThanhToan: "tien_mat",
     },
     {
         id: "11",
@@ -281,7 +281,7 @@ export const mockDonHangs: DonHang[] = [
         ngayAm: "Âm 30/11",
         khachHang: { ten: "A HUY", soDienThoai: "987654321", diaChi: "456 XYZ" },
         sanPhams: [{ id: "sp21", ten: "Heo Nguyên Con", kichThuoc: "7kg", soLuong: 1, maHang: "#H7" }],
-        tongTien: 2290000, phiShip: 0, trangThai: "chua_giao", phuongThucThanhToan: "tien_mat",
+        tongTien: 2290000, phiShip: 0, trangThai: "Chưa giao", phuongThucThanhToan: "tien_mat",
     },
     // 19/01/2026
     {
@@ -292,7 +292,7 @@ export const mockDonHangs: DonHang[] = [
         ngayAm: "Âm 1/12",
         khachHang: { ten: "NGỌC ANH", soDienThoai: "909123456", diaChi: "789 DEF" },
         sanPhams: [{ id: "sp22", ten: "Heo Nguyên Con", kichThuoc: "8kg", soLuong: 2, maHang: "#H8" }],
-        tongTien: 5600000, phiShip: 0, trangThai: "chua_giao", phuongThucThanhToan: "chuyen_khoan",
+        tongTien: 5600000, phiShip: 0, trangThai: "Chưa giao", phuongThucThanhToan: "chuyen_khoan",
     },
     // 20/01/2026
     {
@@ -303,7 +303,7 @@ export const mockDonHangs: DonHang[] = [
         ngayAm: "Âm 2/12",
         khachHang: { ten: "VĂN MINH", soDienThoai: "908765432", diaChi: "111 GHI" },
         sanPhams: [{ id: "sp23", ten: "Heo Nguyên Con", kichThuoc: "7.5kg", soLuong: 1, maHang: "#H8" }],
-        tongTien: 3100000, phiShip: 0, trangThai: "da_giao", phuongThucThanhToan: "tien_mat",
+        tongTien: 3100000, phiShip: 0, trangThai: "Đã giao", phuongThucThanhToan: "tien_mat",
     },
     {
         id: "14",
@@ -313,7 +313,7 @@ export const mockDonHangs: DonHang[] = [
         ngayAm: "Âm 2/12",
         khachHang: { ten: "THU HƯƠNG", soDienThoai: "907654321", diaChi: "222 JKL" },
         sanPhams: [{ id: "sp24", ten: "Heo Nguyên Con", kichThuoc: "6kg", soLuong: 1, maHang: "#H6" }],
-        tongTien: 2500000, phiShip: 50000, trangThai: "chua_giao", phuongThucThanhToan: "tien_mat",
+        tongTien: 2500000, phiShip: 50000, trangThai: "Chưa giao", phuongThucThanhToan: "tien_mat",
     },
     // 21/01/2026
     {
@@ -324,7 +324,7 @@ export const mockDonHangs: DonHang[] = [
         ngayAm: "Âm 3/12",
         khachHang: { ten: "MINH TÂM", soDienThoai: "906543210", diaChi: "333 MNO" },
         sanPhams: [{ id: "sp25", ten: "Heo Nguyên Con", kichThuoc: "8kg", soLuong: 1, maHang: "#H8" }],
-        tongTien: 3200000, phiShip: 0, trangThai: "chua_giao", phuongThucThanhToan: "chuyen_khoan",
+        tongTien: 3200000, phiShip: 0, trangThai: "Chưa giao", phuongThucThanhToan: "chuyen_khoan",
     },
     // 22/01/2026
     {
@@ -335,7 +335,7 @@ export const mockDonHangs: DonHang[] = [
         ngayAm: "Âm 4/12",
         khachHang: { ten: "HOÀNG YẾN", soDienThoai: "905432109", diaChi: "444 PQR" },
         sanPhams: [{ id: "sp26", ten: "Heo Nguyên Con", kichThuoc: "7kg", soLuong: 2, maHang: "#H7" }],
-        tongTien: 5400000, phiShip: 0, trangThai: "da_giao", phuongThucThanhToan: "tien_mat",
+        tongTien: 5400000, phiShip: 0, trangThai: "Đã giao", phuongThucThanhToan: "tien_mat",
     },
     {
         id: "17",
@@ -345,7 +345,7 @@ export const mockDonHangs: DonHang[] = [
         ngayAm: "Âm 4/12",
         khachHang: { ten: "QUỐC KHÁNH", soDienThoai: "904321098", diaChi: "555 STU" },
         sanPhams: [{ id: "sp27", ten: "Heo Nguyên Con", kichThuoc: "6.5kg", soLuong: 1, maHang: "#H7" }],
-        tongTien: 2700000, phiShip: 30000, trangThai: "chua_giao", phuongThucThanhToan: "tien_mat",
+        tongTien: 2700000, phiShip: 30000, trangThai: "Chưa giao", phuongThucThanhToan: "tien_mat",
     },
     // 25/01/2026
     {
@@ -356,7 +356,7 @@ export const mockDonHangs: DonHang[] = [
         ngayAm: "Âm 7/12",
         khachHang: { ten: "CHÍ HÙNG", soDienThoai: "903210987", diaChi: "666 VWX" },
         sanPhams: [{ id: "sp28", ten: "Heo Nguyên Con", kichThuoc: "8kg", soLuong: 1, maHang: "#H8" }],
-        tongTien: 3200000, phiShip: 0, trangThai: "chua_giao", phuongThucThanhToan: "tien_mat",
+        tongTien: 3200000, phiShip: 0, trangThai: "Chưa giao", phuongThucThanhToan: "tien_mat",
     },
     {
         id: "19",
@@ -366,7 +366,7 @@ export const mockDonHangs: DonHang[] = [
         ngayAm: "Âm 7/12",
         khachHang: { ten: "THẢO MY", soDienThoai: "902109876", diaChi: "777 YZA" },
         sanPhams: [{ id: "sp29", ten: "Heo Nguyên Con", kichThuoc: "7kg", soLuong: 1, maHang: "#H7" }],
-        tongTien: 2800000, phiShip: 0, trangThai: "da_giao", phuongThucThanhToan: "chuyen_khoan",
+        tongTien: 2800000, phiShip: 0, trangThai: "Đã giao", phuongThucThanhToan: "chuyen_khoan",
     },
     {
         id: "20",
@@ -376,7 +376,7 @@ export const mockDonHangs: DonHang[] = [
         ngayAm: "Âm 7/12",
         khachHang: { ten: "PHƯƠNG LINH", soDienThoai: "901098765", diaChi: "888 BCD" },
         sanPhams: [{ id: "sp30", ten: "Heo Nguyên Con", kichThuoc: "6kg", soLuong: 2, maHang: "#H6" }],
-        tongTien: 4800000, phiShip: 50000, trangThai: "chua_giao", phuongThucThanhToan: "tien_mat",
+        tongTien: 4800000, phiShip: 50000, trangThai: "Chưa giao", phuongThucThanhToan: "tien_mat",
     },
     // 26/01/2026
     {
@@ -387,7 +387,7 @@ export const mockDonHangs: DonHang[] = [
         ngayAm: "Âm 8/12",
         khachHang: { ten: "ĐÌNH NAM", soDienThoai: "900987654", diaChi: "999 EFG" },
         sanPhams: [{ id: "sp31", ten: "Heo Nguyên Con", kichThuoc: "7.5kg", soLuong: 1, maHang: "#H8" }],
-        tongTien: 3100000, phiShip: 0, trangThai: "chua_giao", phuongThucThanhToan: "tien_mat",
+        tongTien: 3100000, phiShip: 0, trangThai: "Chưa giao", phuongThucThanhToan: "tien_mat",
     },
     // 27/01/2026
     {
@@ -398,7 +398,7 @@ export const mockDonHangs: DonHang[] = [
         ngayAm: "Âm 9/12",
         khachHang: { ten: "BÍCH NGỌC", soDienThoai: "899876543", diaChi: "123 HIJ" },
         sanPhams: [{ id: "sp32", ten: "Heo Nguyên Con", kichThuoc: "8kg", soLuong: 2, maHang: "#H8" }],
-        tongTien: 6400000, phiShip: 0, trangThai: "da_giao", phuongThucThanhToan: "chuyen_khoan",
+        tongTien: 6400000, phiShip: 0, trangThai: "Đã giao", phuongThucThanhToan: "chuyen_khoan",
     },
     {
         id: "23",
@@ -408,7 +408,7 @@ export const mockDonHangs: DonHang[] = [
         ngayAm: "Âm 9/12",
         khachHang: { ten: "TUẤN ANH", soDienThoai: "898765432", diaChi: "456 KLM" },
         sanPhams: [{ id: "sp33", ten: "Heo Nguyên Con", kichThuoc: "6kg", soLuong: 1, maHang: "#H6" }],
-        tongTien: 2400000, phiShip: 40000, trangThai: "chua_giao", phuongThucThanhToan: "tien_mat",
+        tongTien: 2400000, phiShip: 40000, trangThai: "Chưa giao", phuongThucThanhToan: "tien_mat",
     },
     // 28/01/2026
     {
@@ -419,7 +419,7 @@ export const mockDonHangs: DonHang[] = [
         ngayAm: "Âm 10/12",
         khachHang: { ten: "CHÍ HẰNG", soDienThoai: "897654321", diaChi: "789 NOP" },
         sanPhams: [{ id: "sp34", ten: "Heo Nguyên Con", kichThuoc: "7kg", soLuong: 1, maHang: "#H7" }],
-        tongTien: 2850000, phiShip: 0, trangThai: "chua_giao", phuongThucThanhToan: "tien_mat",
+        tongTien: 2850000, phiShip: 0, trangThai: "Chưa giao", phuongThucThanhToan: "tien_mat",
     },
     {
         id: "25",
@@ -429,7 +429,7 @@ export const mockDonHangs: DonHang[] = [
         ngayAm: "Âm 10/12",
         khachHang: { ten: "ĐỊM ĐỊM", soDienThoai: "896543210", diaChi: "111 QRS" },
         sanPhams: [{ id: "sp35", ten: "Heo Nguyên Con", kichThuoc: "6.5kg", soLuong: 1, maHang: "#H7" }],
-        tongTien: 2650000, phiShip: 0, trangThai: "da_giao", phuongThucThanhToan: "chuyen_khoan",
+        tongTien: 2650000, phiShip: 0, trangThai: "Đã giao", phuongThucThanhToan: "chuyen_khoan",
     },
     {
         id: "26",
@@ -439,7 +439,7 @@ export const mockDonHangs: DonHang[] = [
         ngayAm: "Âm 10/12",
         khachHang: { ten: "DƯƠNG NGỌC MAI", soDienThoai: "895432109", diaChi: "222 TUV" },
         sanPhams: [{ id: "sp36", ten: "Heo Nguyên Con", kichThuoc: "8kg", soLuong: 1, maHang: "#H8" }],
-        tongTien: 3200000, phiShip: 0, trangThai: "chua_giao", phuongThucThanhToan: "tien_mat",
+        tongTien: 3200000, phiShip: 0, trangThai: "Chưa giao", phuongThucThanhToan: "tien_mat",
     },
     {
         id: "27",
@@ -449,7 +449,7 @@ export const mockDonHangs: DonHang[] = [
         ngayAm: "Âm 10/12",
         khachHang: { ten: "NHẬT TRIỀU", soDienThoai: "894321098", diaChi: "333 WXY" },
         sanPhams: [{ id: "sp37", ten: "Heo Nguyên Con", kichThuoc: "7.5kg", soLuong: 1, maHang: "#H8" }],
-        tongTien: 3100000, phiShip: 0, trangThai: "chua_giao", phuongThucThanhToan: "tien_mat",
+        tongTien: 3100000, phiShip: 0, trangThai: "Chưa giao", phuongThucThanhToan: "tien_mat",
     },
     {
         id: "28",
@@ -459,7 +459,7 @@ export const mockDonHangs: DonHang[] = [
         ngayAm: "Âm 10/12",
         khachHang: { ten: "NGHĨA NGUYÊN", soDienThoai: "893210987", diaChi: "444 ZAB" },
         sanPhams: [{ id: "sp38", ten: "Heo Nguyên Con", kichThuoc: "6kg", soLuong: 1, maHang: "#H6" }],
-        tongTien: 2400000, phiShip: 50000, trangThai: "da_giao", phuongThucThanhToan: "tien_mat",
+        tongTien: 2400000, phiShip: 50000, trangThai: "Đã giao", phuongThucThanhToan: "tien_mat",
     },
     // 29/01/2026
     {
@@ -470,7 +470,7 @@ export const mockDonHangs: DonHang[] = [
         ngayAm: "Âm 11/12",
         khachHang: { ten: "HỒNG NHUNG", soDienThoai: "892109876", diaChi: "555 CDE" },
         sanPhams: [{ id: "sp39", ten: "Heo Nguyên Con", kichThuoc: "7kg", soLuong: 2, maHang: "#H7" }],
-        tongTien: 5600000, phiShip: 0, trangThai: "chua_giao", phuongThucThanhToan: "chuyen_khoan",
+        tongTien: 5600000, phiShip: 0, trangThai: "Chưa giao", phuongThucThanhToan: "chuyen_khoan",
     },
     {
         id: "30",
@@ -480,7 +480,7 @@ export const mockDonHangs: DonHang[] = [
         ngayAm: "Âm 11/12",
         khachHang: { ten: "CÔNG VINH", soDienThoai: "891098765", diaChi: "666 FGH" },
         sanPhams: [{ id: "sp40", ten: "Heo Nguyên Con", kichThuoc: "8kg", soLuong: 1, maHang: "#H8" }],
-        tongTien: 3200000, phiShip: 0, trangThai: "chua_giao", phuongThucThanhToan: "tien_mat",
+        tongTien: 3200000, phiShip: 0, trangThai: "Chưa giao", phuongThucThanhToan: "tien_mat",
     },
     // 30/01/2026
     {
@@ -491,7 +491,7 @@ export const mockDonHangs: DonHang[] = [
         ngayAm: "Âm 12/12",
         khachHang: { ten: "LAM HỒNG", soDienThoai: "890987654", diaChi: "777 IJK" },
         sanPhams: [{ id: "sp41", ten: "Heo Nguyên Con", kichThuoc: "6kg", soLuong: 1, maHang: "#H6" }],
-        tongTien: 2450000, phiShip: 0, trangThai: "da_giao", phuongThucThanhToan: "tien_mat",
+        tongTien: 2450000, phiShip: 0, trangThai: "Đã giao", phuongThucThanhToan: "tien_mat",
     },
     {
         id: "32",
@@ -501,7 +501,7 @@ export const mockDonHangs: DonHang[] = [
         ngayAm: "Âm 12/12",
         khachHang: { ten: "LỆTHIHỒNG", soDienThoai: "889876543", diaChi: "888 LMN" },
         sanPhams: [{ id: "sp42", ten: "Heo Nguyên Con", kichThuoc: "7.5kg", soLuong: 1, maHang: "#H8" }],
-        tongTien: 3100000, phiShip: 0, trangThai: "chua_giao", phuongThucThanhToan: "chuyen_khoan",
+        tongTien: 3100000, phiShip: 0, trangThai: "Chưa giao", phuongThucThanhToan: "chuyen_khoan",
     },
     // 31/01/2026
     {
@@ -512,7 +512,7 @@ export const mockDonHangs: DonHang[] = [
         ngayAm: "Âm 13/12",
         khachHang: { ten: "LƯU DUY PHÚC", soDienThoai: "888765432", diaChi: "999 OPQ" },
         sanPhams: [{ id: "sp43", ten: "Heo Nguyên Con", kichThuoc: "8kg", soLuong: 1, maHang: "#H8" }],
-        tongTien: 3200000, phiShip: 0, trangThai: "chua_giao", phuongThucThanhToan: "tien_mat",
+        tongTien: 3200000, phiShip: 0, trangThai: "Chưa giao", phuongThucThanhToan: "tien_mat",
     },
     {
         id: "34",
@@ -522,7 +522,7 @@ export const mockDonHangs: DonHang[] = [
         ngayAm: "Âm 13/12",
         khachHang: { ten: "BỐ HOÀNG ANH", soDienThoai: "887654321", diaChi: "123 RST" },
         sanPhams: [{ id: "sp44", ten: "Heo Nguyên Con", kichThuoc: "7kg", soLuong: 1, maHang: "#H7" }],
-        tongTien: 2900000, phiShip: 0, trangThai: "da_giao", phuongThucThanhToan: "tien_mat",
+        tongTien: 2900000, phiShip: 0, trangThai: "Đã giao", phuongThucThanhToan: "tien_mat",
     },
 ];
 

@@ -41,4 +41,31 @@ export const ordersApi = {
         // Reverse order so newest items appear first
         return data.data.reverse();
     },
+
+    /**
+     * Update order status
+     * @param orderId - Order ID (e.g., "web-83234742")
+     * @param status - New status ("Chưa giao" | "Đang giao" | "Đã giao" | "Đã hủy")
+     * @returns Promise<boolean> - True if successful
+     * @throws Error if API returns error or network fails
+     */
+    updateOrderStatus: async (orderId: string, status: string): Promise<boolean> => {
+        const response = await fetch(
+            "https://asia-82692522.n8nhosting.cloud/webhook/api/v1/heoquay/orders/update-status",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ orderId, status }),
+            }
+        );
+
+        if (!response.ok) {
+            const data = await response.json().catch(() => ({}));
+            throw new Error(data.message || "Không thể cập nhật trạng thái");
+        }
+
+        return true;
+    },
 };

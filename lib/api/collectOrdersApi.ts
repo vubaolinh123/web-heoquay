@@ -8,11 +8,13 @@ export interface CollectOrderItem {
     maHang: string;
     tenHang: string;
     tongSoLuong: number;
+    chiNhanh?: string;  // Branch info per item
 }
 
 export interface CollectOrderDay {
     ngayGiaoHang: string;  // "27-01-2026"
     ngayAm: string;        // "09-12-2025"
+    chiNhanh?: string;     // Branch info (optional)
     danhSachHang: CollectOrderItem[];
 }
 

@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { Package, RefreshCw, AlertCircle } from "lucide-react";
-import MobileLayout from "@/components/MobileLayout";
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { Package, RefreshCw, AlertCircle, Building2 } from "lucide-react";
+import MobileLayout, { FilterOption } from "@/components/MobileLayout";
 import { DateCard } from "@/components/GomHang";
 import Toast from "@/components/Toast";
 import { collectOrdersApi, CollectOrderDay } from "@/lib/api";
 import { useAutoRefresh } from "@/hooks";
+import { useOrders } from "@/contexts";
 import styles from "./page.module.css";
 
 export default function GomHangPage() {
@@ -14,6 +15,27 @@ export default function GomHangPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [showToast, setShowToast] = useState(false);
+    const [selectedBranch, setSelectedBranch] = useState<string>("");
+
+    // Get branch options from orders context
+    const { orders: ordersData } = useOrders();
+
+    // Generate branch options from orders data
+    const branchOptions = useMemo<FilterOption[]>(() => {
+        const uniqueBranches = new Set<string>();
+
+        ordersData.forEach((order) => {
+            if (order.chiNhanh) {
+                uniqueBranches.add(order.chiNhanh);
+            }
+        });
+
+        const sorted = Array.from(uniqueBranches).sort();
+        return [
+            { value: "", label: "Tất cả chi nhánh" },
+            ...sorted.map((branch) => ({ value: branch, label: branch })),
+        ];
+    }, [ordersData]);
 
     const fetchData = useCallback(async () => {
         try {
@@ -52,18 +74,46 @@ export default function GomHangPage() {
         setShowToast(true);
     };
 
+    // Clear filters handler
+    const handleClearFilters = () => {
+        setSelectedBranch("");
+    };
+
     useEffect(() => {
         fetchData();
     }, [fetchData]);
 
+    // Filter data by branch if chiNhanh field is available
+    const filteredData = useMemo(() => {
+        if (!selectedBranch) return data;
+        // If the API returns branch info, filter by it
+        // Since collect orders may not have branch info per day,
+        // we just pass the filter through - the API should handle it in future
+        return data.filter((day) => {
+            // If chiNhanh is present on day level, filter
+            if (day.chiNhanh) {
+                return day.chiNhanh === selectedBranch;
+            }
+            // Otherwise, show all (API doesn't support branch filtering yet)
+            return true;
+        });
+    }, [data, selectedBranch]);
+
     // Calculate total stats
-    const totalDays = data.length;
-    const totalItems = data.reduce((sum, day) =>
+    const totalDays = filteredData.length;
+    const totalItems = filteredData.reduce((sum, day) =>
         sum + day.danhSachHang.reduce((daySum, item) => daySum + item.tongSoLuong, 0), 0
     );
 
     return (
-        <MobileLayout onRefresh={handleManualRefresh} refreshCountdown={countdown}>
+        <MobileLayout
+            onRefresh={handleManualRefresh}
+            refreshCountdown={countdown}
+            selectedBranch={selectedBranch}
+            onBranchChange={setSelectedBranch}
+            branchOptions={branchOptions}
+            onClearFilters={handleClearFilters}
+        >
             <div className={styles.container}>
                 {/* Page Header */}
                 <div className={styles.pageHeader}>
@@ -74,6 +124,12 @@ export default function GomHangPage() {
                         </h1>
                         <p className={styles.subtitle}>
                             Tổng hợp sản phẩm theo ngày giao
+                            {selectedBranch && (
+                                <span className={styles.branchBadge}>
+                                    <Building2 size={14} />
+                                    {selectedBranch}
+                                </span>
+                            )}
                         </p>
                     </div>
                     <button
@@ -86,7 +142,7 @@ export default function GomHangPage() {
                 </div>
 
                 {/* Stats Summary */}
-                {!isLoading && !error && data.length > 0 && (
+                {!isLoading && !error && filteredData.length > 0 && (
                     <div className={styles.summary}>
                         <div className={styles.summaryItem}>
                             <span className={styles.summaryValue}>{totalDays}</span>
@@ -129,19 +185,27 @@ export default function GomHangPage() {
                 )}
 
                 {/* Empty State */}
-                {!isLoading && !error && data.length === 0 && (
+                {!isLoading && !error && filteredData.length === 0 && (
                     <div className={styles.empty}>
                         <Package size={64} />
                         <h3>Chưa có đơn hàng gom</h3>
-                        <p>Dữ liệu gom hàng sẽ hiển thị ở đây</p>
+                        <p>
+                            {selectedBranch
+                                ? `Không có dữ liệu gom hàng cho ${selectedBranch}`
+                                : "Dữ liệu gom hàng sẽ hiển thị ở đây"}
+                        </p>
                     </div>
                 )}
 
                 {/* Data Grid */}
-                {!isLoading && !error && data.length > 0 && (
+                {!isLoading && !error && filteredData.length > 0 && (
                     <div className={styles.grid}>
-                        {data.map((day, index) => (
-                            <DateCard key={`${day.ngayGiaoHang}-${index}`} data={day} />
+                        {filteredData.map((day, index) => (
+                            <DateCard
+                                key={`${day.ngayGiaoHang}-${index}`}
+                                data={day}
+                                branch={selectedBranch || day.chiNhanh}
+                            />
                         ))}
                     </div>
                 )}

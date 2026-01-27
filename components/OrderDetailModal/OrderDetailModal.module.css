@@ -88,12 +88,87 @@
   text-transform: uppercase;
   margin-bottom: var(--spacing-sm);
   letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.loadingSpinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .sectionContent {
   background-color: var(--color-background);
   border-radius: var(--radius-md);
   padding: var(--spacing-md);
+}
+
+/* Status Buttons */
+.statusButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+}
+
+.statusButton {
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  border: 2px solid transparent;
+  background-color: var(--color-background);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  opacity: 0.6;
+}
+
+.statusButton:hover:not(:disabled) {
+  opacity: 0.8;
+}
+
+.statusButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.statusButtonActive {
+  opacity: 1;
+  border-color: currentColor;
+}
+
+.statusButton.statusPending {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.statusButton.statusInProgress {
+  background-color: #dbeafe;
+  color: #2563eb;
+}
+
+.statusButton.statusDelivered {
+  background-color: #dcfce7;
+  color: #16a34a;
+}
+
+.statusButton.statusCancelled {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.errorMessage {
+  margin-top: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  background-color: #fee2e2;
+  color: #dc2626;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
 }
 
 /* Customer Info */
@@ -199,30 +274,6 @@
   color: var(--color-primary);
   padding-top: var(--spacing-sm);
   border-top: 2px solid var(--color-border);
-}
-
-/* Status Badge */
-.statusRow {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-}
-
-.statusBadge {
-  padding: var(--spacing-xs) var(--spacing-md);
-  border-radius: var(--radius-full);
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-}
-
-.statusDelivered {
-  background-color: var(--color-success-light);
-  color: var(--color-success);
-}
-
-.statusPending {
-  background-color: var(--color-info-light);
-  color: var(--color-info);
 }
 
 /* Footer Actions */
