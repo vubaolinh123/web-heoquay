@@ -96,11 +96,17 @@ export default function KitchenSlipModal({
         }
     };
 
-    // Calculate summary
+    // Helper function to check if product is shipping fee
+    const isShippingFee = (productName: string) => {
+        const nameLower = productName.toLowerCase();
+        return nameLower.includes("phí ship") || nameLower.includes("phi ship");
+    };
+
+    // Calculate summary (exclude shipping fees)
     const pendingOrders = orders.filter((o) => o.trangThai === "Chưa giao" || o.trangThai === "Đang giao");
     const deliveredOrders = orders.filter((o) => o.trangThai === "Đã giao");
     const totalProducts = orders.reduce(
-        (sum, o) => sum + o.sanPhams.reduce((s, p) => s + p.soLuong, 0),
+        (sum, o) => sum + o.sanPhams.filter(p => !isShippingFee(p.ten)).reduce((s, p) => s + p.soLuong, 0),
         0
     );
 
@@ -109,9 +115,8 @@ export default function KitchenSlipModal({
     let totalProductsInSummary = 0;
     orders.forEach((order) => {
         order.sanPhams.forEach((product) => {
-            // Skip "Phí ship" products
-            const productNameLower = product.ten.toLowerCase();
-            if (productNameLower.includes("phí ship") || productNameLower.includes("phi ship")) {
+            // Skip shipping fee products
+            if (isShippingFee(product.ten)) {
                 return;
             }
             const key = `${product.ten} ${product.kichThuoc || ""} ${product.maHang || ""}`.trim();
@@ -189,14 +194,14 @@ export default function KitchenSlipModal({
                                     </td>
                                     <td style={{ border: '1px solid #1e293b', padding: '8px 10px', verticalAlign: 'top' }}>{order.diaChiGiao || order.khachHang.diaChi}</td>
                                     <td style={{ border: '1px solid #1e293b', padding: '8px 10px', verticalAlign: 'top' }}>
-                                        {order.sanPhams.map((p, i) => (
+                                        {order.sanPhams.filter(p => !isShippingFee(p.ten)).map((p, i) => (
                                             <div key={i}>
                                                 {p.ten} {p.kichThuoc} {p.maHang}
                                             </div>
                                         ))}
                                     </td>
                                     <td style={{ border: '1px solid #1e293b', padding: '8px 10px', textAlign: 'center', fontWeight: 700, verticalAlign: 'top' }}>
-                                        {order.sanPhams.reduce((sum, p) => sum + p.soLuong, 0)}
+                                        {order.sanPhams.filter(p => !isShippingFee(p.ten)).reduce((sum, p) => sum + p.soLuong, 0)}
                                     </td>
                                     <td style={{ border: '1px solid #1e293b', padding: '8px 10px', verticalAlign: 'top' }}>{order.ghiChu || ""}</td>
                                 </tr>
@@ -219,11 +224,11 @@ export default function KitchenSlipModal({
                             <h3 style={{ fontSize: '12px', fontWeight: 700, color: '#1e293b', margin: '0 0 8px', textTransform: 'uppercase' }}>TRẠNG THÁI ĐƠN HÀNG</h3>
                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', padding: '4px 0' }}>
                                 <span>Chưa giao</span>
-                                <span>{pendingOrders.length} đơn-{pendingOrders.reduce((s, o) => s + o.sanPhams.reduce((ps, p) => ps + p.soLuong, 0), 0)} sp</span>
+                                <span>{pendingOrders.length} đơn-{pendingOrders.reduce((s, o) => s + o.sanPhams.filter(p => !isShippingFee(p.ten)).reduce((ps, p) => ps + p.soLuong, 0), 0)} sp</span>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', padding: '4px 0' }}>
                                 <span>Đã giao</span>
-                                <span>{deliveredOrders.length} đơn-{deliveredOrders.reduce((s, o) => s + o.sanPhams.reduce((ps, p) => ps + p.soLuong, 0), 0)} sp</span>
+                                <span>{deliveredOrders.length} đơn-{deliveredOrders.reduce((s, o) => s + o.sanPhams.filter(p => !isShippingFee(p.ten)).reduce((ps, p) => ps + p.soLuong, 0), 0)} sp</span>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', padding: '8px 0 4px', borderTop: '1px solid #1e293b', marginTop: '8px', fontWeight: 700 }}>
                                 <span>TỔNG CỘNG</span>
