@@ -6,6 +6,7 @@ export interface SanPham {
     soLuong: number;       // Quantity
     maHang: string;        // Product code (e.g., "#H8")
     ghiChu?: string;       // Notes
+    donGia?: number;       // Unit price
 }
 
 export interface KhachHang {
@@ -14,7 +15,7 @@ export interface KhachHang {
     diaChi: string;        // Address
 }
 
-export type TrangThaiDon = "Chưa giao" | "Đang giao" | "Đã giao" | "Đã hủy";
+export type TrangThaiDon = "Chưa giao" | "Đang quay" | "Đang giao" | "Đã giao" | "Đã hủy";
 
 export interface DonHang {
     id: string;

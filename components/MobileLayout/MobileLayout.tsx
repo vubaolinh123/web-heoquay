@@ -21,7 +21,7 @@ import {
 import { useAuth } from "@/contexts";
 import styles from "./MobileLayout.module.css";
 
-export type FilterStatus = "all" | "Chưa giao" | "Đang giao" | "Đã giao" | "Đã hủy";
+export type FilterStatus = "all" | "Chưa giao" | "Đang quay" | "Đang giao" | "Đã giao" | "Đã hủy";
 
 export interface FilterOption {
     value: string;
@@ -37,6 +37,7 @@ interface MobileLayoutProps {
     orderCounts?: {
         all: number;
         pending: number;
+        roasting: number;
         inProgress: number;
         delivered: number;
         cancelled: number;
@@ -69,6 +70,7 @@ const navItems = [
 const filterTabs: { id: FilterStatus; label: string }[] = [
     { id: "all", label: "Tất cả" },
     { id: "Chưa giao", label: "Chưa giao" },
+    { id: "Đang quay", label: "Đang quay" },
     { id: "Đang giao", label: "Đang giao" },
     { id: "Đã giao", label: "Đã giao" },
     { id: "Đã hủy", label: "Đã hủy" },
@@ -93,7 +95,7 @@ export default function MobileLayout({
     onFilterChange,
     searchQuery = "",
     onSearchChange,
-    orderCounts = { all: 0, pending: 0, inProgress: 0, delivered: 0, cancelled: 0 },
+    orderCounts = { all: 0, pending: 0, roasting: 0, inProgress: 0, delivered: 0, cancelled: 0 },
     selectedDate = "",
     onDateChange,
     selectedBranch = "",
@@ -147,6 +149,7 @@ export default function MobileLayout({
         switch (tabId) {
             case "all": return orderCounts.all;
             case "Chưa giao": return orderCounts.pending;
+            case "Đang quay": return orderCounts.roasting;
             case "Đang giao": return orderCounts.inProgress;
             case "Đã giao": return orderCounts.delivered;
             case "Đã hủy": return orderCounts.cancelled;

@@ -38,7 +38,7 @@ export interface ApiOrder {
     gioGiaoHang: string;            // Format: "HH:mm"
     hinhThucGiao: string;           // "Giao hàng" | "Đến lấy"
     phuongThucThanhToan: string;    // "Tiền mặt" | "Chuyển khoản"
-    trangThai: string;              // "Chưa giao" | "Đang giao" | "Đã giao" | "Đã hủy"
+    trangThai: string;              // "Chưa giao" | "Đang quay" | "Đang giao" | "Đã giao" | "Đã hủy"
     tenKhachHang: string;
     dienThoai: number;
     diaChi: string;

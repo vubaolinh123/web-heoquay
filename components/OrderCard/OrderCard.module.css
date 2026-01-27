@@ -75,6 +75,11 @@
   color: #dc2626;
 }
 
+.statusRoasting {
+  background-color: #ffedd5;
+  color: #ea580c;
+}
+
 /* Delivery method styles */
 .statusDelivery {
   background-color: #dbeafe;

@@ -45,7 +45,7 @@ export const ordersApi = {
     /**
      * Update order status
      * @param orderId - Order ID (e.g., "web-83234742")
-     * @param status - New status ("Chưa giao" | "Đang giao" | "Đã giao" | "Đã hủy")
+     * @param status - New status ("Chưa giao" | "Đang quay" | "Đang giao" | "Đã giao" | "Đã hủy")
      * @returns Promise<boolean> - True if successful
      * @throws Error if API returns error or network fails
      */
@@ -73,4 +73,78 @@ export const ordersApi = {
             throw error;
         }
     },
+
+    /**
+     * Update order items (add/update products)
+     * Uses Next.js API route as proxy to avoid CORS issues
+     * @param orderId - Order ID (e.g., "WEB-SHDKADHS")
+     * @param items - Array of items to update/add
+     * @returns Promise<boolean> - True if successful
+     * @throws Error if API returns error or network fails
+     */
+    updateOrderItems: async (orderId: string, items: OrderItemUpdate[]): Promise<boolean> => {
+        try {
+            const response = await fetch("/api/orders/update", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ orderId, items }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "Không thể cập nhật đơn hàng");
+            }
+
+            console.log("Update order items result:", data);
+            return true;
+        } catch (error) {
+            console.error("Update order items error:", error);
+            throw error;
+        }
+    },
+
+    /**
+     * Send Zalo notification to customer
+     * Uses Next.js API route as proxy to avoid CORS issues
+     * @param orderId - Order ID (e.g., "WEB-SHDKADHS")
+     * @param phoneNumber - Customer phone number
+     * @returns Promise<boolean> - True if successful
+     * @throws Error if API returns error or network fails
+     */
+    sendZaloToCustomer: async (orderId: string, phoneNumber: string): Promise<boolean> => {
+        try {
+            const response = await fetch("/api/orders/send-zalo", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ orderId, phone_number: phoneNumber }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "Không thể gửi Zalo");
+            }
+
+            console.log("Send Zalo result:", data);
+            return true;
+        } catch (error) {
+            console.error("Send Zalo error:", error);
+            throw error;
+        }
+    },
 };
+
+/**
+ * Order item update payload
+ */
+export interface OrderItemUpdate {
+    code: string;    // "#H7", "#TP", etc
+    name: string;    // Product name
+    quantity: number;
+    price: number;
+}

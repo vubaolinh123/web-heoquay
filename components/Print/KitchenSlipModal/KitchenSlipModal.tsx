@@ -103,7 +103,7 @@ export default function KitchenSlipModal({
     };
 
     // Calculate summary (exclude shipping fees)
-    const pendingOrders = orders.filter((o) => o.trangThai === "Chưa giao" || o.trangThai === "Đang giao");
+    const pendingOrders = orders.filter((o) => o.trangThai === "Chưa giao" || o.trangThai === "Đang quay" || o.trangThai === "Đang giao");
     const deliveredOrders = orders.filter((o) => o.trangThai === "Đã giao");
     const totalProducts = orders.reduce(
         (sum, o) => sum + o.sanPhams.filter(p => !isShippingFee(p.ten)).reduce((s, p) => s + p.soLuong, 0),

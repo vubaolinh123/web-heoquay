@@ -99,6 +99,27 @@ export default function HomePage() {
     setShowToast(true);
   }, [silentRefresh, resetCountdown]);
 
+  // Handler refresh after order update (for modal inline editing)
+  const handleOrderUpdate = useCallback(async () => {
+    try {
+      const apiOrders = await ordersApi.getOrders();
+      const transformedOrders = apiOrders.map(transformApiOrder);
+      const groupedOrders = groupOrdersByDate(transformedOrders);
+      setAllOrdersGroupedByDay(groupedOrders);
+
+      // Re-select the updated order to refresh modal data
+      if (selectedOrder) {
+        const allOrders = groupedOrders.flatMap((d) => d.donHangs);
+        const updatedOrder = allOrders.find((o) => o.maDon === selectedOrder.maDon);
+        if (updatedOrder) {
+          setSelectedOrder(updatedOrder);
+        }
+      }
+    } catch (err) {
+      console.error("Order update refresh failed:", err);
+    }
+  }, [selectedOrder]);
+
   // Initial data fetch
   useEffect(() => {
     fetchOrders();
@@ -156,17 +177,38 @@ export default function HomePage() {
     }).filter((day) => day.donHangs.length > 0);
   }, [allOrdersGroupedByDay, activeFilter, searchQuery, selectedDate, selectedBranch, selectedDeliveryMethod]);
 
-  // Calculate order counts for tabs
+  // Calculate order counts for tabs - based on FILTERED data (by branch/date/delivery, but not status)
   const orderCounts = useMemo(() => {
-    const allOrders = allOrdersGroupedByDay.flatMap((d) => d.donHangs);
+    // First apply branch/date/delivery filters (but NOT status filter)
+    let preFilteredOrders = allOrdersGroupedByDay.flatMap((d) => d.donHangs);
+
+    // Apply date filter
+    if (selectedDate) {
+      preFilteredOrders = preFilteredOrders.filter((d) => {
+        const orderDateStr = d.ngay.toISOString().split("T")[0];
+        return orderDateStr === selectedDate;
+      });
+    }
+
+    // Apply branch filter
+    if (selectedBranch) {
+      preFilteredOrders = preFilteredOrders.filter((d) => d.chiNhanh === selectedBranch);
+    }
+
+    // Apply delivery method filter
+    if (selectedDeliveryMethod) {
+      preFilteredOrders = preFilteredOrders.filter((d) => d.hinhThucGiao === selectedDeliveryMethod);
+    }
+
     return {
-      all: allOrders.length,
-      pending: allOrders.filter((d) => d.trangThai === "Chưa giao").length,
-      inProgress: allOrders.filter((d) => d.trangThai === "Đang giao").length,
-      delivered: allOrders.filter((d) => d.trangThai === "Đã giao").length,
-      cancelled: allOrders.filter((d) => d.trangThai === "Đã hủy").length,
+      all: preFilteredOrders.length,
+      pending: preFilteredOrders.filter((d) => d.trangThai === "Chưa giao").length,
+      roasting: preFilteredOrders.filter((d) => d.trangThai === "Đang quay").length,
+      inProgress: preFilteredOrders.filter((d) => d.trangThai === "Đang giao").length,
+      delivered: preFilteredOrders.filter((d) => d.trangThai === "Đã giao").length,
+      cancelled: preFilteredOrders.filter((d) => d.trangThai === "Đã hủy").length,
     };
-  }, [allOrdersGroupedByDay]);
+  }, [allOrdersGroupedByDay, selectedDate, selectedBranch, selectedDeliveryMethod]);
 
   // Generate dynamic date options from API data
   const dateOptions = useMemo<FilterOption[]>(() => {
@@ -362,7 +404,7 @@ export default function HomePage() {
         onFilterChange={setActiveFilter}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        orderCounts={{ all: 0, pending: 0, inProgress: 0, delivered: 0, cancelled: 0 }}
+        orderCounts={{ all: 0, pending: 0, roasting: 0, inProgress: 0, delivered: 0, cancelled: 0 }}
       >
         <div className={styles.loadingState}>
           <div className={styles.spinner}></div>
@@ -380,7 +422,7 @@ export default function HomePage() {
         onFilterChange={setActiveFilter}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        orderCounts={{ all: 0, pending: 0, inProgress: 0, delivered: 0, cancelled: 0 }}
+        orderCounts={{ all: 0, pending: 0, roasting: 0, inProgress: 0, delivered: 0, cancelled: 0 }}
       >
         <div className={styles.errorState}>
           <p className={styles.errorMessage}>⚠️ {error}</p>
@@ -483,6 +525,7 @@ export default function HomePage() {
           onClose={() => setSelectedOrder(null)}
           onPrintKitchen={handlePrintKitchen}
           onPrintInvoice={handlePrintInvoice}
+          onOrderUpdate={handleOrderUpdate}
         />
       )}
 

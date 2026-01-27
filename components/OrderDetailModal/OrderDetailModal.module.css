@@ -162,6 +162,11 @@
   color: #dc2626;
 }
 
+.statusButton.statusRoasting {
+  background-color: #ffedd5;
+  color: #ea580c;
+}
+
 .errorMessage {
   margin-top: var(--spacing-sm);
   padding: var(--spacing-sm);
@@ -316,3 +321,287 @@
 .secondaryButton:active {
   background-color: var(--color-border);
 }
+
+/* ===================== */
+/* Product Editing Styles */
+/* ===================== */
+
+/* Edit input inline */
+.editInput {
+  width: 70px;
+  padding: 6px 8px;
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  text-align: center;
+  background: white;
+}
+
+.editInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+/* Action buttons */
+.actionButtons {
+  display: flex;
+  gap: 4px;
+}
+
+.actionButtons button,
+.editBtn,
+.saveBtn,
+.cancelBtn {
+  padding: 6px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  transition: all 0.15s;
+}
+
+.editBtn {
+  color: var(--color-text-secondary);
+}
+
+.editBtn:hover {
+  background: #f1f5f9;
+  color: var(--color-primary);
+}
+
+.saveBtn {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.saveBtn:hover {
+  background: #bbf7d0;
+}
+
+.saveBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cancelBtn {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.cancelBtn:hover {
+  background: #fecaca;
+}
+
+/* Add product button */
+.addProductBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px dashed #16a34a;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  margin-top: var(--spacing-md);
+  width: 100%;
+  justify-content: center;
+  font-weight: 500;
+  font-size: var(--font-size-sm);
+  transition: all 0.2s;
+}
+
+.addProductBtn:hover {
+  background: #dcfce7;
+  border-style: solid;
+}
+
+/* Add product form */
+.addProductForm {
+  background: #f8fafc;
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  margin-top: var(--spacing-md);
+  border: 1px solid var(--color-border);
+}
+
+.addProductRow {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+.addProductRow input {
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  background: white;
+}
+
+.addProductRow input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.addProductName {
+  flex: 3;
+  min-width: 0;
+}
+
+.addProductQty,
+.addProductPrice {
+  flex: 1;
+  min-width: 60px;
+  text-align: center;
+}
+
+.addProductSave,
+.addProductCancel {
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.addProductSave {
+  background: var(--color-primary);
+  color: white;
+}
+
+.addProductSave:hover {
+  background: #4f46e5;
+}
+
+.addProductSave:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.addProductCancel {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.addProductCancel:hover {
+  background: #fecaca;
+}
+
+/* Product error message */
+.productError {
+  margin-top: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  background-color: #fee2e2;
+  color: #dc2626;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+}
+
+/* Spin animation for loading */
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ===================== */
+/* Send Zalo Button Styles */
+/* ===================== */
+
+.zaloButtonWrapper {
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: 1px dashed var(--color-border);
+}
+
+.sendZaloBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #0068ff 0%, #0056d9 100%);
+  color: white;
+  border: none;
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 104, 255, 0.3);
+}
+
+.sendZaloBtn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0056d9 0%, #0041a8 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 104, 255, 0.4);
+}
+
+.sendZaloBtn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 104, 255, 0.3);
+}
+
+.sendZaloBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.sendZaloBtn.sendZaloSuccess {
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+}
+
+.zaloError {
+  margin-top: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  background-color: #fee2e2;
+  color: #dc2626;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  text-align: center;
+}
+
+/* Mobile optimization - larger touch targets */
+@media (max-width: 768px) {
+  .sendZaloBtn {
+    padding: 16px 24px;
+    font-size: 16px;
+    border-radius: var(--radius-xl);
+  }
+  
+  .zaloButtonWrapper {
+    position: sticky;
+    bottom: 0;
+    background: var(--color-surface);
+    margin-left: calc(-1 * var(--spacing-md));
+    margin-right: calc(-1 * var(--spacing-md));
+    margin-bottom: calc(-1 * var(--spacing-md));
+    padding: var(--spacing-md);
+    border-top: 1px solid var(--color-border);
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Tablet optimization */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .sendZaloBtn {
+    padding: 14px 24px;
+    font-size: 15px;
+  }
+}
+

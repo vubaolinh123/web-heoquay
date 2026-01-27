@@ -16,12 +16,13 @@ interface OrderCardProps {
 // Status configuration for colors and labels
 const STATUS_CONFIG: Record<TrangThaiDon, { label: string; className: string }> = {
     "Chưa giao": { label: "CHƯA GIAO", className: "statusPending" },
+    "Đang quay": { label: "ĐANG QUAY", className: "statusRoasting" },
     "Đang giao": { label: "ĐANG GIAO", className: "statusInProgress" },
     "Đã giao": { label: "ĐÃ GIAO", className: "statusDelivered" },
     "Đã hủy": { label: "ĐÃ HỦY", className: "statusCancelled" },
 };
 
-const STATUS_OPTIONS: TrangThaiDon[] = ["Chưa giao", "Đang giao", "Đã giao", "Đã hủy"];
+const STATUS_OPTIONS: TrangThaiDon[] = ["Chưa giao", "Đang quay", "Đang giao", "Đã giao", "Đã hủy"];
 
 export default function OrderCard({ donHang, onClick, onStatusUpdate }: OrderCardProps) {
     const [currentStatus, setCurrentStatus] = useState<TrangThaiDon>(donHang.trangThai);

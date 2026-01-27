@@ -5,44 +5,25 @@ import { Package, RefreshCw, AlertCircle, Building2 } from "lucide-react";
 import MobileLayout, { FilterOption } from "@/components/MobileLayout";
 import { DateCard } from "@/components/GomHang";
 import Toast from "@/components/Toast";
-import { collectOrdersApi, CollectOrderDay } from "@/lib/api";
+import { collectOrdersApi, CollectOrderRawItem, groupCollectOrdersByDate } from "@/lib/api";
 import { useAutoRefresh } from "@/hooks";
-import { useOrders } from "@/contexts";
 import styles from "./page.module.css";
 
 export default function GomHangPage() {
-    const [data, setData] = useState<CollectOrderDay[]>([]);
+    // Store raw items from API
+    const [rawItems, setRawItems] = useState<CollectOrderRawItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [showToast, setShowToast] = useState(false);
     const [selectedBranch, setSelectedBranch] = useState<string>("");
 
-    // Get branch options from orders context
-    const { orders: ordersData } = useOrders();
-
-    // Generate branch options from orders data
-    const branchOptions = useMemo<FilterOption[]>(() => {
-        const uniqueBranches = new Set<string>();
-
-        ordersData.forEach((order) => {
-            if (order.chiNhanh) {
-                uniqueBranches.add(order.chiNhanh);
-            }
-        });
-
-        const sorted = Array.from(uniqueBranches).sort();
-        return [
-            { value: "", label: "Tất cả chi nhánh" },
-            ...sorted.map((branch) => ({ value: branch, label: branch })),
-        ];
-    }, [ordersData]);
-
+    // Fetch raw items from API
     const fetchData = useCallback(async () => {
         try {
             setIsLoading(true);
             setError(null);
-            const result = await collectOrdersApi.getAll();
-            setData(result);
+            const items = await collectOrdersApi.getRawItems();
+            setRawItems(items);
         } catch (err) {
             console.error("Failed to fetch collect orders:", err);
             setError(err instanceof Error ? err.message : "Có lỗi xảy ra khi tải dữ liệu");
@@ -54,8 +35,8 @@ export default function GomHangPage() {
     // Silent refresh (no loading state)
     const silentRefresh = useCallback(async () => {
         try {
-            const result = await collectOrdersApi.getAll();
-            setData(result);
+            const items = await collectOrdersApi.getRawItems();
+            setRawItems(items);
         } catch (err) {
             console.error("Silent refresh failed:", err);
         }
@@ -83,25 +64,31 @@ export default function GomHangPage() {
         fetchData();
     }, [fetchData]);
 
-    // Filter data by branch if chiNhanh field is available
-    const filteredData = useMemo(() => {
-        if (!selectedBranch) return data;
-        // If the API returns branch info, filter by it
-        // Since collect orders may not have branch info per day,
-        // we just pass the filter through - the API should handle it in future
-        return data.filter((day) => {
-            // If chiNhanh is present on day level, filter
-            if (day.chiNhanh) {
-                return day.chiNhanh === selectedBranch;
+    // Generate branch options from raw items
+    const branchOptions = useMemo<FilterOption[]>(() => {
+        const uniqueBranches = new Set<string>();
+
+        rawItems.forEach((item) => {
+            if (item.chiNhanh) {
+                uniqueBranches.add(item.chiNhanh);
             }
-            // Otherwise, show all (API doesn't support branch filtering yet)
-            return true;
         });
-    }, [data, selectedBranch]);
+
+        const sorted = Array.from(uniqueBranches).sort();
+        return [
+            { value: "", label: "Tất cả chi nhánh" },
+            ...sorted.map((branch) => ({ value: branch, label: branch })),
+        ];
+    }, [rawItems]);
+
+    // Group data based on branch filter (client-side grouping)
+    const groupedData = useMemo(() => {
+        return groupCollectOrdersByDate(rawItems, selectedBranch || undefined);
+    }, [rawItems, selectedBranch]);
 
     // Calculate total stats
-    const totalDays = filteredData.length;
-    const totalItems = filteredData.reduce((sum, day) =>
+    const totalDays = groupedData.length;
+    const totalItems = groupedData.reduce((sum, day) =>
         sum + day.danhSachHang.reduce((daySum, item) => daySum + item.tongSoLuong, 0), 0
     );
 
@@ -142,7 +129,7 @@ export default function GomHangPage() {
                 </div>
 
                 {/* Stats Summary */}
-                {!isLoading && !error && filteredData.length > 0 && (
+                {!isLoading && !error && groupedData.length > 0 && (
                     <div className={styles.summary}>
                         <div className={styles.summaryItem}>
                             <span className={styles.summaryValue}>{totalDays}</span>
@@ -185,7 +172,7 @@ export default function GomHangPage() {
                 )}
 
                 {/* Empty State */}
-                {!isLoading && !error && filteredData.length === 0 && (
+                {!isLoading && !error && groupedData.length === 0 && (
                     <div className={styles.empty}>
                         <Package size={64} />
                         <h3>Chưa có đơn hàng gom</h3>
@@ -198,13 +185,13 @@ export default function GomHangPage() {
                 )}
 
                 {/* Data Grid */}
-                {!isLoading && !error && filteredData.length > 0 && (
+                {!isLoading && !error && groupedData.length > 0 && (
                     <div className={styles.grid}>
-                        {filteredData.map((day, index) => (
+                        {groupedData.map((day, index) => (
                             <DateCard
                                 key={`${day.ngayGiaoHang}-${index}`}
                                 data={day}
-                                branch={selectedBranch || day.chiNhanh}
+                                branch={selectedBranch || undefined}
                             />
                         ))}
                     </div>
