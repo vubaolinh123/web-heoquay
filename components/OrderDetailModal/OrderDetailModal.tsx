@@ -98,6 +98,8 @@ export default function OrderDetailModal({
             await ordersApi.updateOrderStatus(donHang.maDon, newStatus);
             setCurrentStatus(newStatus);
             onStatusUpdate?.(donHang.maDon, newStatus);
+            // Refresh data to update filter counts immediately
+            if (onOrderUpdate) await onOrderUpdate();
         } catch (error) {
             setUpdateError(error instanceof Error ? error.message : "Có lỗi xảy ra");
         } finally {

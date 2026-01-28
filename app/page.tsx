@@ -509,6 +509,7 @@ export default function HomePage() {
                       key={donHang.id}
                       donHang={donHang}
                       onClick={() => setSelectedOrder(donHang)}
+                      onStatusUpdate={() => handleOrderUpdate()}
                     />
                   ))}
                 </div>
