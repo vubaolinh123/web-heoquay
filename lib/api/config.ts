@@ -5,7 +5,7 @@
 
 // API Base URL from environment variable
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ||
-    "https://asia-82692522.n8nhosting.cloud/webhook/api/v1/heoquay";
+    "https://asia-82692522.phoaify.com/webhook/api/v1/heoquay";
 
 // API Endpoints
 export const API_ENDPOINTS = {
