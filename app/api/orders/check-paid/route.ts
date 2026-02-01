@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { API_ENDPOINTS } from "@/lib/api/config";
+import { API_ENDPOINTS, getAuthHeaders, getTokenFromRequest } from "@/lib/api/config";
 
 /**
  * POST /api/orders/check-paid
@@ -7,6 +7,16 @@ import { API_ENDPOINTS } from "@/lib/api/config";
  */
 export async function POST(request: NextRequest) {
     try {
+        // Get token from request
+        const token = getTokenFromRequest(request);
+
+        if (!token) {
+            return NextResponse.json(
+                { error: "1", message: "Unauthorized - Please login" },
+                { status: 401 }
+            );
+        }
+
         const body = await request.json();
         const { orderId } = body;
 
@@ -17,23 +27,26 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Call external API to check payment status
+        console.log("Checking payment for order:", orderId);
+
+        // Call external API to check payment status with auth token
         const response = await fetch(API_ENDPOINTS.orderCheckPaid, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
+            headers: getAuthHeaders(token),
             body: JSON.stringify({ orderId }),
         });
 
-        const data = await response.json();
-
         if (!response.ok) {
+            const errorText = await response.text();
+            console.error("Check paid API Error:", response.status, errorText);
             return NextResponse.json(
-                { error: "1", message: data.message || "Không thể kiểm tra thanh toán" },
+                { error: "1", message: errorText || "Không thể kiểm tra thanh toán" },
                 { status: response.status }
             );
         }
+
+        const data = await response.json();
+        console.log("Check paid response:", data);
 
         return NextResponse.json({
             error: "0",

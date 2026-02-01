@@ -147,9 +147,7 @@ export const ordersApi = {
         try {
             const response = await fetch("/api/orders/qr-payment", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: getHeaders(),
                 body: JSON.stringify({ orderId }),
             });
 
@@ -175,9 +173,7 @@ export const ordersApi = {
         try {
             const response = await fetch("/api/orders/check-paid", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: getHeaders(),
                 body: JSON.stringify({ orderId }),
             });
 
@@ -204,9 +200,7 @@ export const ordersApi = {
         try {
             const response = await fetch("/api/orders/shipper-confirm", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: getHeaders(),
                 body: JSON.stringify({ orderId, shipper }),
             });
 
@@ -236,13 +230,28 @@ export interface OrderItemUpdate {
 }
 
 /**
- * QR Payment response
+ * QR Payment response from API
  */
 export interface QRPaymentResponse {
-    qrBase64?: string;    // Base64 encoded QR image
-    qrUrl?: string;       // Alternative: URL to QR image
-    orderId: string;
-    amount?: number;
+    content?: string;         // Message to display to user
+    type?: string;            // "file" - type of QR
+    qr?: string;              // Base64 encoded QR image (data:image/png;base64,...)
+    amount?: number;          // Amount to pay
+    totalAmount?: number;     // Total amount
+    bankContent?: string;     // Bank transfer content/description
+    account?: {
+        bank?: {
+            name?: string;    // Bank name (e.g., "Ngân hàng TMCP Tiên Phong")
+            shortName?: string; // Short name (e.g., "TPBank")
+            logo?: string;    // Bank logo URL
+        };
+        name?: string;        // Account holder name
+        number?: string;      // Account number
+    };
+    // Legacy fields for compatibility
+    qrBase64?: string;
+    qrUrl?: string;
+    orderId?: string;
 }
 
 /**

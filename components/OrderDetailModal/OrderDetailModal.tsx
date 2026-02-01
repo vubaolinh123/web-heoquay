@@ -73,7 +73,16 @@ export default function OrderDetailModal({
 
     // QR Payment state
     const [showQRModal, setShowQRModal] = useState(false);
-    const [qrUrl, setQrUrl] = useState<string | null>(null);
+    const [qrData, setQrData] = useState<{
+        qrUrl: string | null;
+        content: string | null;
+        bankContent: string | null;
+        amount: number | null;
+        bankName: string | null;
+        bankLogo: string | null;
+        accountName: string | null;
+        accountNumber: string | null;
+    } | null>(null);
     const [isLoadingQR, setIsLoadingQR] = useState(false);
 
     // Check if can edit post-roast products (only for Chi nhánh 1)
@@ -290,20 +299,23 @@ export default function OrderDetailModal({
     const handleGetQR = async () => {
         setIsLoadingQR(true);
         setShowQRModal(true);
+        setQrData(null);
 
         try {
-            const response = await fetch("/api/orders/qr-payment", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    orderId: donHang.maDon,
-                    amount: donHang.tongTien,
-                }),
-            });
-
-            const data = await response.json();
-            if (data.error === "0" && data.data?.qrUrl) {
-                setQrUrl(data.data.qrUrl);
+            const data = await ordersApi.getQRPayment(donHang.maDon);
+            // Handle QR response - API returns data.qr field
+            const qrImage = data.qr || data.qrBase64 || data.qrUrl;
+            if (qrImage) {
+                setQrData({
+                    qrUrl: qrImage,
+                    content: data.content || null,
+                    bankContent: data.bankContent || null,
+                    amount: data.amount || data.totalAmount || null,
+                    bankName: data.account?.bank?.shortName || data.account?.bank?.name || null,
+                    bankLogo: data.account?.bank?.logo || null,
+                    accountName: data.account?.name || null,
+                    accountNumber: data.account?.number || null,
+                });
             }
         } catch (error) {
             console.error("QR error:", error);
@@ -487,6 +499,29 @@ export default function OrderDetailModal({
                                         <span className={styles.infoValue}>{donHang.chiNhanh}</span>
                                     </div>
                                 )}
+                                {donHang.hinhThucGiao && (
+                                    <div className={styles.infoRow}>
+                                        <span className={styles.infoLabel}>Hình thức:</span>
+                                        <span className={`${styles.infoValue} ${styles.infoBadge}`}>
+                                            {donHang.hinhThucGiao}
+                                        </span>
+                                    </div>
+                                )}
+                                {donHang.shipperNhanDon && (
+                                    <div className={styles.infoRow}>
+                                        <UserCheck size={16} className={styles.infoIcon} />
+                                        <span className={styles.infoLabel}>Shipper:</span>
+                                        <span className={`${styles.infoValue} ${styles.shipperBadge}`}>
+                                            {donHang.shipperNhanDon}
+                                        </span>
+                                    </div>
+                                )}
+                                <div className={styles.infoRow}>
+                                    <span className={styles.infoLabel}>Thanh toán:</span>
+                                    <span className={`${styles.infoValue} ${donHang.phuongThucThanhToan === "chuyen_khoan" ? styles.paymentTransfer : styles.paymentCash}`}>
+                                        {donHang.phuongThucThanhToan === "chuyen_khoan" ? "Chuyển khoản" : "Tiền mặt"}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -724,11 +759,42 @@ export default function OrderDetailModal({
                                     <Loader2 size={32} className={styles.loadingSpinner} />
                                     <p>Đang tạo QR...</p>
                                 </div>
-                            ) : qrUrl ? (
+                            ) : qrData?.qrUrl ? (
                                 <div className={styles.qrImageContainer}>
-                                    <img src={qrUrl} alt="QR Payment" className={styles.qrImage} />
-                                    <p className={styles.qrAmount}>Số tiền: {formatTien(donHang.tongTien)}</p>
-                                    <p className={styles.qrOrderId}>Đơn hàng: {donHang.maDon}</p>
+                                    {/* QR Image */}
+                                    <img src={qrData.qrUrl} alt="QR Payment" className={styles.qrImage} />
+
+                                    {/* Amount */}
+                                    {qrData.amount && (
+                                        <p className={styles.qrAmount}>Số tiền: {formatTien(qrData.amount)}</p>
+                                    )}
+
+                                    {/* Bank Info */}
+                                    {(qrData.bankName || qrData.accountNumber) && (
+                                        <div className={styles.qrBankInfo}>
+                                            {qrData.bankLogo && (
+                                                <img src={qrData.bankLogo} alt={qrData.bankName || "Bank"} className={styles.qrBankLogo} />
+                                            )}
+                                            <div className={styles.qrBankDetails}>
+                                                {qrData.bankName && <span className={styles.qrBankName}>{qrData.bankName}</span>}
+                                                {qrData.accountNumber && <span className={styles.qrAccountNumber}>STK: {qrData.accountNumber}</span>}
+                                                {qrData.accountName && <span className={styles.qrAccountName}>{qrData.accountName}</span>}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Transfer Content */}
+                                    {qrData.bankContent && (
+                                        <div className={styles.qrTransferContent}>
+                                            <span className={styles.qrTransferLabel}>Nội dung CK:</span>
+                                            <span className={styles.qrTransferValue}>{qrData.bankContent}</span>
+                                        </div>
+                                    )}
+
+                                    {/* Instructions */}
+                                    {qrData.content && (
+                                        <p className={styles.qrInstructions}>{qrData.content}</p>
+                                    )}
                                 </div>
                             ) : (
                                 <p>Không thể tạo QR</p>

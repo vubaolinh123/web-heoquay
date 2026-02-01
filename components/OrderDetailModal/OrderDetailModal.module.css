@@ -686,16 +686,33 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--spacing-md);
+  padding: var(--spacing-xl);
 }
 
 .qrModal {
   background: white;
   border-radius: var(--radius-xl);
-  max-width: 380px;
+  max-width: 450px;
   width: 100%;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
   animation: scaleIn 0.2s ease-out;
+}
+
+/* Mobile responsive for QR Modal */
+@media (max-width: 768px) {
+  .qrOverlay {
+    padding: 24px 16px;
+    align-items: flex-start;
+    padding-top: 48px;
+  }
+
+  .qrModal {
+    max-width: 100%;
+    max-height: calc(100vh - 96px);
+    border-radius: var(--radius-lg);
+  }
 }
 
 .qrHeader {
@@ -785,3 +802,112 @@
   font-size: var(--font-size-sm);
 }
 
+/* QR Bank Info Styles */
+.qrBankInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: #f8fafc;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+}
+
+.qrBankLogo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+}
+
+.qrBankDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+}
+
+.qrBankName {
+  font-weight: 600;
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+}
+
+.qrAccountNumber {
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: var(--color-primary);
+  letter-spacing: 0.5px;
+}
+
+.qrAccountName {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.qrTransferContent {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: #fff7ed;
+  border-radius: var(--radius-md);
+  border: 1px solid #fdba74;
+}
+
+.qrTransferLabel {
+  font-size: var(--font-size-xs);
+  color: #9a3412;
+  font-weight: 500;
+}
+
+.qrTransferValue {
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: #c2410c;
+  word-break: break-all;
+}
+
+.qrInstructions {
+  margin-top: var(--spacing-md);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  text-align: center;
+  white-space: pre-line;
+}
+
+/* Info badges */
+.infoBadge {
+  padding: 2px 8px;
+  background: #e0f2fe;
+  color: #0369a1;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+}
+
+.shipperBadge {
+  padding: 2px 8px;
+  background: #dcfce7;
+  color: #16a34a;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+}
+
+.paymentCash {
+  padding: 2px 8px;
+  background: #fef3c7;
+  color: #d97706;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+}
+
+.paymentTransfer {
+  padding: 2px 8px;
+  background: #dbeafe;
+  color: #2563eb;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+}
