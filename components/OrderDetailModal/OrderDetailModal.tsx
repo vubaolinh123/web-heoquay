@@ -719,7 +719,7 @@ export default function OrderDetailModal({
                                     <div className={`${styles.totalRow} ${styles.depositRow}`}>
                                         <span className={styles.totalLabel}>Đã cọc:</span>
                                         <span className={`${styles.totalValue} ${styles.depositValue}`}>
-                                            -{formatTien(donHang.tienDatCoc)}
+                                            {formatTien(donHang.tienDatCoc)}
                                         </span>
                                     </div>
                                 )}
