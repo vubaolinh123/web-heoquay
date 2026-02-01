@@ -45,6 +45,7 @@ export interface ApiOrder {
     dienThoai: number;
     diaChi: string;
     tongTien: number;
+    daCoc?: number;                 // Deposit amount
     danhSachHang: ApiOrderItem[];
 }
 

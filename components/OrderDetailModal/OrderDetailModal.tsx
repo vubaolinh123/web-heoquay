@@ -715,6 +715,14 @@ export default function OrderDetailModal({
                                         </span>
                                     </div>
                                 )}
+                                {donHang.tienDatCoc && donHang.tienDatCoc > 0 && (
+                                    <div className={`${styles.totalRow} ${styles.depositRow}`}>
+                                        <span className={styles.totalLabel}>Đã cọc:</span>
+                                        <span className={`${styles.totalValue} ${styles.depositValue}`}>
+                                            -{formatTien(donHang.tienDatCoc)}
+                                        </span>
+                                    </div>
+                                )}
                                 <div className={styles.totalRow}>
                                     <span className={styles.totalLabel}>Phương thức:</span>
                                     <span className={styles.totalValue}>
@@ -727,6 +735,14 @@ export default function OrderDetailModal({
                                     <span>Tổng cộng:</span>
                                     <span>{formatTien(donHang.tongTien)}</span>
                                 </div>
+                                {donHang.tienDatCoc && donHang.tienDatCoc > 0 && (
+                                    <div className={`${styles.totalRow} ${styles.remainingRow}`}>
+                                        <span className={styles.totalLabel}>Còn lại:</span>
+                                        <span className={`${styles.totalValue} ${styles.remainingValue}`}>
+                                            {formatTien(donHang.tongTien - donHang.tienDatCoc)}
+                                        </span>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

@@ -911,3 +911,30 @@
   border-radius: var(--radius-sm);
   font-weight: 500;
 }
+
+/* Deposit and Remaining Amount */
+.depositRow {
+  background: #f0fdf4;
+  padding: 4px 8px;
+  margin: 4px 0;
+  border-radius: var(--radius-sm);
+}
+
+.depositValue {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.remainingRow {
+  background: #fef3c7;
+  padding: 8px;
+  margin-top: 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid #fcd34d;
+}
+
+.remainingValue {
+  color: #d97706;
+  font-weight: 700;
+  font-size: 1.1em;
+}
