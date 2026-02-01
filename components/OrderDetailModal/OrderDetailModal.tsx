@@ -735,14 +735,6 @@ export default function OrderDetailModal({
                                     <span>Tổng cộng:</span>
                                     <span>{formatTien(donHang.tongTien)}</span>
                                 </div>
-                                {donHang.tienDatCoc && donHang.tienDatCoc > 0 && (
-                                    <div className={`${styles.totalRow} ${styles.remainingRow}`}>
-                                        <span className={styles.totalLabel}>Còn lại:</span>
-                                        <span className={`${styles.totalValue} ${styles.remainingValue}`}>
-                                            {formatTien(donHang.tongTien - donHang.tienDatCoc)}
-                                        </span>
-                                    </div>
-                                )}
                             </div>
                         </div>
                     </div>
