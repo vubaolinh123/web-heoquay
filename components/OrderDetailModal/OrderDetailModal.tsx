@@ -85,8 +85,11 @@ export default function OrderDetailModal({
     } | null>(null);
     const [isLoadingQR, setIsLoadingQR] = useState(false);
 
-    // Check if can edit post-roast products (only for Chi nhánh 1)
+    // Check if can edit post-roast products (only for Chi nhánh 1 and NOT shipper)
     const canEditPostRoast = useMemo(() => {
+        // Shipper cannot edit post-roast products
+        if (isShipper) return false;
+
         const branch = donHang.chiNhanh || "";
         // Normalize: remove spaces, convert to lowercase, remove diacritics for comparison
         const normalized = branch.toLowerCase()
@@ -98,7 +101,7 @@ export default function OrderDetailModal({
         return normalized.includes("chinhanh1") ||
             normalized === "1" ||
             branch.trim().endsWith("1");
-    }, [donHang.chiNhanh]);
+    }, [donHang.chiNhanh, isShipper]);
 
     // Prevent body scroll when modal is open
     useEffect(() => {
