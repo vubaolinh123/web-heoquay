@@ -16,7 +16,7 @@ export interface KhachHang {
     diaChi: string;        // Address
 }
 
-export type TrangThaiDon = "Chưa giao" | "Đang quay" | "Đang giao" | "Đã giao" | "Đã hủy";
+export type TrangThaiDon = "Chưa giao" | "Đang quay" | "Đang giao" | "Đã giao" | "Đã chuyển khoản" | "Đã hủy";
 
 export interface DonHang {
     id: string;
@@ -36,6 +36,8 @@ export interface DonHang {
     gioGiao?: string;      // Delivery time
     chiNhanh?: string;     // Branch (e.g., "Chi Nhánh 1")
     hinhThucGiao?: string; // Delivery method (e.g., "Giao hàng", "Đến lấy")
+    tienDatCoc?: number;   // Deposit amount
+    shipperNhanDon?: string; // Shipper who confirmed this order
 }
 
 export interface DonHangTheoNgay {

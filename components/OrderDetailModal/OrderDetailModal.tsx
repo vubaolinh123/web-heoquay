@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { X, Phone, MapPin, Calendar, Clock, Building2, Loader2, Edit2, Save, Plus, MessageCircle } from "lucide-react";
+import { useEffect, useState, useMemo } from "react";
+import { X, Phone, MapPin, Calendar, Clock, Building2, Loader2, Edit2, Save, Plus, MessageCircle, QrCode, UserCheck, Lock } from "lucide-react";
 import { DonHang, TrangThaiDon, SanPham } from "@/lib/types";
 import { formatTien } from "@/lib/mockData";
 import { ordersApi } from "@/lib/api";
+import { useAuth } from "@/contexts/AuthContext";
 import styles from "./OrderDetailModal.module.css";
 
 interface OrderDetailModalProps {
@@ -22,6 +23,7 @@ const STATUS_OPTIONS: { value: TrangThaiDon; label: string; color: string }[] = 
     { value: "Đang quay", label: "Đang quay", color: "#ea580c" },
     { value: "Đang giao", label: "Đang giao", color: "#2563eb" },
     { value: "Đã giao", label: "Đã giao", color: "#16a34a" },
+    { value: "Đã chuyển khoản", label: "Đã chuyển khoản", color: "#9333ea" },
     { value: "Đã hủy", label: "Đã hủy", color: "#dc2626" },
 ];
 
@@ -39,6 +41,7 @@ export default function OrderDetailModal({
     onStatusUpdate,
     onOrderUpdate,
 }: OrderDetailModalProps) {
+    const { isShipper, isAdmin, user } = useAuth();
     const [currentStatus, setCurrentStatus] = useState<TrangThaiDon>(donHang.trangThai);
     const [isUpdating, setIsUpdating] = useState(false);
     const [updateError, setUpdateError] = useState<string | null>(null);
@@ -62,6 +65,31 @@ export default function OrderDetailModal({
     const [isSendingZalo, setIsSendingZalo] = useState(false);
     const [zaloSuccess, setZaloSuccess] = useState(false);
     const [zaloError, setZaloError] = useState<string | null>(null);
+
+    // Shipper confirm state
+    const [isConfirmingOrder, setIsConfirmingOrder] = useState(false);
+    const [confirmSuccess, setConfirmSuccess] = useState(false);
+    const [confirmError, setConfirmError] = useState<string | null>(null);
+
+    // QR Payment state
+    const [showQRModal, setShowQRModal] = useState(false);
+    const [qrUrl, setQrUrl] = useState<string | null>(null);
+    const [isLoadingQR, setIsLoadingQR] = useState(false);
+
+    // Check if can edit post-roast products (only for Chi nhánh 1)
+    const canEditPostRoast = useMemo(() => {
+        const branch = donHang.chiNhanh || "";
+        // Normalize: remove spaces, convert to lowercase, remove diacritics for comparison
+        const normalized = branch.toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "") // Remove diacritics
+            .replace(/\s+/g, ""); // Remove spaces
+
+        // Check if it contains "chinhanh1" or ends with "1"
+        return normalized.includes("chinhanh1") ||
+            normalized === "1" ||
+            branch.trim().endsWith("1");
+    }, [donHang.chiNhanh]);
 
     // Prevent body scroll when modal is open
     useEffect(() => {
@@ -113,6 +141,7 @@ export default function OrderDetailModal({
             case "Đã giao": return styles.statusDelivered;
             case "Đang quay": return styles.statusRoasting;
             case "Đang giao": return styles.statusInProgress;
+            case "Đã chuyển khoản": return styles.statusTransferred;
             case "Đã hủy": return styles.statusCancelled;
             default: return styles.statusPending;
         }
@@ -224,6 +253,65 @@ export default function OrderDetailModal({
         }
     };
 
+    // Handle shipper confirm order
+    const handleShipperConfirm = async () => {
+        if (isConfirmingOrder || !user?.userName) return;
+
+        setIsConfirmingOrder(true);
+        setConfirmError(null);
+        setConfirmSuccess(false);
+
+        try {
+            const response = await fetch("/api/orders/shipper-confirm", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    orderId: donHang.maDon,
+                    shipper: user.userName,
+                }),
+            });
+
+            const data = await response.json();
+            if (data.error === "0") {
+                setConfirmSuccess(true);
+                setTimeout(() => setConfirmSuccess(false), 3000);
+                if (onOrderUpdate) await onOrderUpdate();
+            } else {
+                setConfirmError(data.message || "Có lỗi xảy ra");
+            }
+        } catch (error) {
+            setConfirmError(error instanceof Error ? error.message : "Không thể nhận đơn");
+        } finally {
+            setIsConfirmingOrder(false);
+        }
+    };
+
+    // Handle get QR for payment
+    const handleGetQR = async () => {
+        setIsLoadingQR(true);
+        setShowQRModal(true);
+
+        try {
+            const response = await fetch("/api/orders/qr-payment", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    orderId: donHang.maDon,
+                    amount: donHang.tongTien,
+                }),
+            });
+
+            const data = await response.json();
+            if (data.error === "0" && data.data?.qrUrl) {
+                setQrUrl(data.data.qrUrl);
+            }
+        } catch (error) {
+            console.error("QR error:", error);
+        } finally {
+            setIsLoadingQR(false);
+        }
+    };
+
     return (
         <div className={styles.overlay} onClick={onClose}>
             <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
@@ -237,28 +325,94 @@ export default function OrderDetailModal({
 
                 {/* Content */}
                 <div className={styles.modalContent}>
-                    {/* Status Section */}
+                    {/* Status Section - Admin only can change */}
                     <div className={styles.section}>
                         <div className={styles.sectionTitle}>
                             Trạng thái
                             {isUpdating && <Loader2 size={14} className={styles.loadingSpinner} />}
                         </div>
                         <div className={styles.sectionContent}>
-                            <div className={styles.statusButtons}>
-                                {STATUS_OPTIONS.map((option) => (
-                                    <button
-                                        key={option.value}
-                                        className={`${styles.statusButton} ${currentStatus === option.value ? styles.statusButtonActive : ""} ${getStatusClass(option.value)}`}
-                                        onClick={() => handleStatusChange(option.value)}
-                                        disabled={isUpdating}
-                                    >
-                                        {option.label}
-                                    </button>
-                                ))}
-                            </div>
+                            {isAdmin ? (
+                                <div className={styles.statusButtons}>
+                                    {STATUS_OPTIONS.map((option) => (
+                                        <button
+                                            key={option.value}
+                                            className={`${styles.statusButton} ${currentStatus === option.value ? styles.statusButtonActive : ""} ${getStatusClass(option.value)}`}
+                                            onClick={() => handleStatusChange(option.value)}
+                                            disabled={isUpdating}
+                                        >
+                                            {option.label}
+                                        </button>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className={`${styles.statusBadge} ${getStatusClass(currentStatus)}`}>
+                                    {currentStatus}
+                                </div>
+                            )}
                             {updateError && (
                                 <div className={styles.errorMessage}>{updateError}</div>
                             )}
+                        </div>
+                    </div>
+
+                    {/* Action Buttons - Shipper actions */}
+                    <div className={styles.section}>
+                        <div className={styles.sectionTitle}>Thao tác</div>
+                        <div className={styles.sectionContent}>
+                            <div className={styles.actionButtonsRow}>
+                                {/* Shipper confirm button */}
+                                {isShipper && (
+                                    <button
+                                        className={`${styles.actionBtn} ${styles.confirmBtn}`}
+                                        onClick={handleShipperConfirm}
+                                        disabled={isConfirmingOrder || confirmSuccess}
+                                    >
+                                        {isConfirmingOrder ? (
+                                            <Loader2 size={16} className={styles.loadingSpinner} />
+                                        ) : confirmSuccess ? (
+                                            <>✓ Đã nhận</>
+                                        ) : (
+                                            <>
+                                                <UserCheck size={16} />
+                                                Nhận đơn
+                                            </>
+                                        )}
+                                    </button>
+                                )}
+
+                                {/* QR Payment button - for everyone */}
+                                <button
+                                    className={`${styles.actionBtn} ${styles.qrBtn}`}
+                                    onClick={handleGetQR}
+                                    disabled={isLoadingQR}
+                                >
+                                    <QrCode size={16} />
+                                    Lấy QR chuyển khoản
+                                </button>
+
+                                {/* Send Zalo - Admin only */}
+                                {isAdmin && (
+                                    <button
+                                        className={`${styles.actionBtn} ${styles.zaloBtn}`}
+                                        onClick={handleSendZalo}
+                                        disabled={isSendingZalo || zaloSuccess}
+                                    >
+                                        {isSendingZalo ? (
+                                            <Loader2 size={16} className={styles.loadingSpinner} />
+                                        ) : zaloSuccess ? (
+                                            <>✓ Đã gửi</>
+                                        ) : (
+                                            <>
+                                                <MessageCircle size={16} />
+                                                Gửi Zalo
+                                            </>
+                                        )}
+                                    </button>
+                                )}
+                            </div>
+                            {confirmError && <div className={styles.errorMessage}>{confirmError}</div>}
+                            {zaloError && <div className={styles.errorMessage}>{zaloError}</div>}
                         </div>
                     </div>
 
@@ -446,61 +600,68 @@ export default function OrderDetailModal({
                                 <div className={styles.productError}>{productError}</div>
                             )}
 
-                            {/* Add product button + form */}
-                            {!isAddingProduct ? (
-                                <button
-                                    onClick={() => setIsAddingProduct(true)}
-                                    className={styles.addProductBtn}
-                                >
-                                    <Plus size={16} />
-                                    Thêm Thành Phẩm Sau Quay
-                                </button>
-                            ) : (
-                                <div className={styles.addProductForm}>
-                                    <div className={styles.addProductRow}>
-                                        <input
-                                            type="text"
-                                            placeholder="Tên sản phẩm"
-                                            value={newProduct.name}
-                                            onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
-                                            className={styles.addProductName}
-                                        />
-                                        <input
-                                            type="number"
-                                            placeholder="SL"
-                                            value={newProduct.quantity}
-                                            onChange={(e) => setNewProduct({ ...newProduct, quantity: Number(e.target.value) })}
-                                            className={styles.addProductQty}
-                                            min={1}
-                                        />
-                                        <input
-                                            type="number"
-                                            placeholder="Giá"
-                                            value={newProduct.price}
-                                            onChange={(e) => setNewProduct({ ...newProduct, price: Number(e.target.value) })}
-                                            className={styles.addProductPrice}
-                                            min={0}
-                                        />
-                                        <button
-                                            className={styles.addProductSave}
-                                            onClick={handleAddProduct}
-                                            disabled={isSubmitting}
-                                            title="Lưu"
-                                        >
-                                            {isSubmitting ? (
-                                                <Loader2 size={14} className={styles.spin} />
-                                            ) : (
-                                                <Save size={14} />
-                                            )}
-                                        </button>
-                                        <button
-                                            className={styles.addProductCancel}
-                                            onClick={cancelAddProduct}
-                                            title="Hủy"
-                                        >
-                                            <X size={14} />
-                                        </button>
+                            {/* Add product button + form - Only for Chi nhánh 1 */}
+                            {canEditPostRoast ? (
+                                !isAddingProduct ? (
+                                    <button
+                                        onClick={() => setIsAddingProduct(true)}
+                                        className={styles.addProductBtn}
+                                    >
+                                        <Plus size={16} />
+                                        Thêm Thành Phẩm Sau Quay
+                                    </button>
+                                ) : (
+                                    <div className={styles.addProductForm}>
+                                        <div className={styles.addProductRow}>
+                                            <input
+                                                type="text"
+                                                placeholder="Tên sản phẩm"
+                                                value={newProduct.name}
+                                                onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
+                                                className={styles.addProductName}
+                                            />
+                                            <input
+                                                type="number"
+                                                placeholder="SL"
+                                                value={newProduct.quantity}
+                                                onChange={(e) => setNewProduct({ ...newProduct, quantity: Number(e.target.value) })}
+                                                className={styles.addProductQty}
+                                                min={1}
+                                            />
+                                            <input
+                                                type="number"
+                                                placeholder="Giá"
+                                                value={newProduct.price}
+                                                onChange={(e) => setNewProduct({ ...newProduct, price: Number(e.target.value) })}
+                                                className={styles.addProductPrice}
+                                                min={0}
+                                            />
+                                            <button
+                                                className={styles.addProductSave}
+                                                onClick={handleAddProduct}
+                                                disabled={isSubmitting}
+                                                title="Lưu"
+                                            >
+                                                {isSubmitting ? (
+                                                    <Loader2 size={14} className={styles.spin} />
+                                                ) : (
+                                                    <Save size={14} />
+                                                )}
+                                            </button>
+                                            <button
+                                                className={styles.addProductCancel}
+                                                onClick={cancelAddProduct}
+                                                title="Hủy"
+                                            >
+                                                <X size={14} />
+                                            </button>
+                                        </div>
                                     </div>
+                                )
+                            ) : (
+                                <div className={styles.lockedSection}>
+                                    <Lock size={16} />
+                                    <span>Thêm thành phẩm sau quay chỉ khả dụng cho Chi nhánh 1</span>
                                 </div>
                             )}
                         </div>
@@ -546,6 +707,36 @@ export default function OrderDetailModal({
                     )}
                 </div>
             </div>
+
+            {/* QR Payment Modal */}
+            {showQRModal && (
+                <div className={styles.qrOverlay} onClick={() => setShowQRModal(false)}>
+                    <div className={styles.qrModal} onClick={(e) => e.stopPropagation()}>
+                        <div className={styles.qrHeader}>
+                            <h3>QR Chuyển khoản</h3>
+                            <button onClick={() => setShowQRModal(false)}>
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className={styles.qrContent}>
+                            {isLoadingQR ? (
+                                <div className={styles.qrLoading}>
+                                    <Loader2 size={32} className={styles.loadingSpinner} />
+                                    <p>Đang tạo QR...</p>
+                                </div>
+                            ) : qrUrl ? (
+                                <div className={styles.qrImageContainer}>
+                                    <img src={qrUrl} alt="QR Payment" className={styles.qrImage} />
+                                    <p className={styles.qrAmount}>Số tiền: {formatTien(donHang.tongTien)}</p>
+                                    <p className={styles.qrOrderId}>Đơn hàng: {donHang.maDon}</p>
+                                </div>
+                            ) : (
+                                <p>Không thể tạo QR</p>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

@@ -91,6 +91,47 @@
     color: #dc2626;
 }
 
+.statsRight {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.copyBtn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #475569;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.copyBtn:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #1e293b;
+}
+
+.copyBtn:active {
+    transform: scale(0.95);
+}
+
+.copyBtnSuccess {
+    background: #dcfce7;
+    border-color: #86efac;
+    color: #16a34a;
+}
+
+.copyBtnSuccess:hover {
+    background: #bbf7d0;
+}
+
 /* Items List */
 .itemsList {
     padding: var(--spacing-sm);

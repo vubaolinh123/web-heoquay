@@ -80,6 +80,11 @@
   color: #ea580c;
 }
 
+.statusTransferred {
+  background-color: #e9d5ff;
+  color: #9333ea;
+}
+
 /* Delivery method styles */
 .statusDelivery {
   background-color: #dbeafe;
@@ -475,6 +480,16 @@
 .statusOption.statusCancelled {
   background: #fee2e2;
   color: #dc2626;
+}
+
+.statusOption.statusTransferred {
+  background: #e9d5ff;
+  color: #9333ea;
+}
+
+.statusOption.statusRoasting {
+  background: #ffedd5;
+  color: #ea580c;
 }
 
 .statusOptionActive {

@@ -137,6 +137,92 @@ export const ordersApi = {
             throw error;
         }
     },
+
+    /**
+     * Get QR code for order payment (returns base64 image)
+     * @param orderId - Order ID (e.g., "WEB-3175680")
+     * @returns Promise<string> - Base64 image string
+     */
+    getQRPayment: async (orderId: string): Promise<QRPaymentResponse> => {
+        try {
+            const response = await fetch("/api/orders/qr-payment", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ orderId }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || data.error !== "0") {
+                throw new Error(data.message || "Không thể lấy mã QR");
+            }
+
+            return data.data;
+        } catch (error) {
+            console.error("Get QR payment error:", error);
+            throw error;
+        }
+    },
+
+    /**
+     * Check if order has been paid
+     * @param orderId - Order ID (e.g., "WEB-2899832")
+     * @returns Promise<CheckPaidResponse> - Payment status
+     */
+    checkOrderPaid: async (orderId: string): Promise<CheckPaidResponse> => {
+        try {
+            const response = await fetch("/api/orders/check-paid", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ orderId }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || data.error !== "0") {
+                throw new Error(data.message || "Không thể kiểm tra thanh toán");
+            }
+
+            return data.data;
+        } catch (error) {
+            console.error("Check order paid error:", error);
+            throw error;
+        }
+    },
+
+    /**
+     * Shipper confirms/accepts an order
+     * @param orderId - Order ID
+     * @param shipper - Shipper name
+     * @returns Promise<boolean> - True if successful
+     */
+    shipperConfirm: async (orderId: string, shipper: string): Promise<boolean> => {
+        try {
+            const response = await fetch("/api/orders/shipper-confirm", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ orderId, shipper }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "Không thể xác nhận đơn");
+            }
+
+            console.log("Shipper confirm result:", data);
+            return true;
+        } catch (error) {
+            console.error("Shipper confirm error:", error);
+            throw error;
+        }
+    },
 };
 
 /**
@@ -148,3 +234,24 @@ export interface OrderItemUpdate {
     quantity: number;
     price: number;
 }
+
+/**
+ * QR Payment response
+ */
+export interface QRPaymentResponse {
+    qrBase64?: string;    // Base64 encoded QR image
+    qrUrl?: string;       // Alternative: URL to QR image
+    orderId: string;
+    amount?: number;
+}
+
+/**
+ * Check paid response
+ */
+export interface CheckPaidResponse {
+    isPaid: boolean;
+    orderId: string;
+    paidAt?: string;
+    amount?: number;
+}
+

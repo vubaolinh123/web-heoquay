@@ -167,6 +167,72 @@
   color: #ea580c;
 }
 
+.statusButton.statusTransferred {
+  background-color: #e9d5ff;
+  color: #9333ea;
+}
+
+/* Status Badge for Shipper view-only mode */
+.statusBadge {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+/* Action Buttons Row */
+.actionButtonsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.actionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.actionBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.confirmBtn {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+}
+
+.confirmBtn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #059669, #047857);
+}
+
+.qrBtn {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: white;
+}
+
+.qrBtn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
+}
+
+.zaloBtn {
+  background: linear-gradient(135deg, #0068ff, #0051cc);
+  color: white;
+}
+
+.zaloBtn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0051cc, #003d99);
+}
+
 .errorMessage {
   margin-top: var(--spacing-sm);
   padding: var(--spacing-sm);
@@ -609,5 +675,113 @@
     padding: 14px 24px;
     font-size: 15px;
   }
+}
+
+/* QR Payment Modal */
+.qrOverlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-md);
+}
+
+.qrModal {
+  background: white;
+  border-radius: var(--radius-xl);
+  max-width: 380px;
+  width: 100%;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  animation: scaleIn 0.2s ease-out;
+}
+
+.qrHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.qrHeader h3 {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.qrHeader button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  padding: 4px;
+  border-radius: var(--radius-sm);
+}
+
+.qrHeader button:hover {
+  background-color: var(--color-background);
+}
+
+.qrContent {
+  padding: var(--spacing-lg);
+  text-align: center;
+}
+
+.qrLoading {
+  padding: var(--spacing-xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  color: var(--color-text-secondary);
+}
+
+.qrImageContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.qrImage {
+  max-width: 280px;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
+}
+
+.qrAmount {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-primary);
+  margin: 0;
+}
+
+.qrOrderId {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* Locked Section for non-branch-1 orders */
+.lockedSection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 16px;
+  background: #f8fafc;
+  color: #64748b;
+  border: 1px dashed #cbd5e1;
+  border-radius: var(--radius-md);
+  cursor: not-allowed;
+  margin-top: var(--spacing-md);
+  width: 100%;
+  font-weight: 500;
+  font-size: var(--font-size-sm);
 }
 

@@ -5,6 +5,7 @@ import { Phone, MapPin, Building2, ChevronDown, Loader2, Check } from "lucide-re
 import { DonHang, TrangThaiDon } from "@/lib/types";
 import { formatTien } from "@/lib/mockData";
 import { ordersApi } from "@/lib/api";
+import { useAuth } from "@/contexts/AuthContext";
 import styles from "./OrderCard.module.css";
 
 interface OrderCardProps {
@@ -19,12 +20,14 @@ const STATUS_CONFIG: Record<TrangThaiDon, { label: string; className: string }> 
     "Đang quay": { label: "ĐANG QUAY", className: "statusRoasting" },
     "Đang giao": { label: "ĐANG GIAO", className: "statusInProgress" },
     "Đã giao": { label: "ĐÃ GIAO", className: "statusDelivered" },
+    "Đã chuyển khoản": { label: "ĐÃ CHUYỂN KHOẢN", className: "statusTransferred" },
     "Đã hủy": { label: "ĐÃ HỦY", className: "statusCancelled" },
 };
 
-const STATUS_OPTIONS: TrangThaiDon[] = ["Chưa giao", "Đang quay", "Đang giao", "Đã giao", "Đã hủy"];
+const STATUS_OPTIONS: TrangThaiDon[] = ["Chưa giao", "Đang quay", "Đang giao", "Đã giao", "Đã chuyển khoản", "Đã hủy"];
 
 export default function OrderCard({ donHang, onClick, onStatusUpdate }: OrderCardProps) {
+    const { isShipper } = useAuth();
     const [currentStatus, setCurrentStatus] = useState<TrangThaiDon>(donHang.trangThai);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isUpdating, setIsUpdating] = useState(false);
@@ -66,10 +69,10 @@ export default function OrderCard({ donHang, onClick, onStatusUpdate }: OrderCar
     // Get status config
     const statusConfig = STATUS_CONFIG[currentStatus] || STATUS_CONFIG["Chưa giao"];
 
-    // Handle status badge click
+    // Handle status badge click - disabled for Shipper
     const handleStatusClick = (e: React.MouseEvent) => {
         e.stopPropagation();
-        if (!isUpdating) {
+        if (!isUpdating && !isShipper) {
             setIsDropdownOpen(!isDropdownOpen);
         }
     };

@@ -13,8 +13,11 @@ import {
 // Types
 // ===========================================
 
-interface User {
+export type UserRole = "Admin" | "Shipper";
+
+export interface User {
     userName: string;
+    role: UserRole;
 }
 
 interface AuthContextValue {
@@ -22,6 +25,8 @@ interface AuthContextValue {
     user: User | null;
     isLoading: boolean;
     isAuthenticated: boolean;
+    isAdmin: boolean;
+    isShipper: boolean;
     login: (userName: string, password: string) => Promise<{ success: boolean; error?: string }>;
     logout: () => void;
 }
@@ -80,7 +85,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
             if (data.error === "0" && data.data?.token) {
                 const newToken = data.data.token;
-                const newUser = { userName };
+                // Get role from API response, default to Shipper if not provided
+                const role: UserRole = data.data.role === "Admin" ? "Admin" : "Shipper";
+                const newUser: User = {
+                    userName: data.data.userName || userName,
+                    role
+                };
 
                 // Store in localStorage
                 localStorage.setItem(TOKEN_KEY, newToken);
@@ -119,6 +129,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         user,
         isLoading,
         isAuthenticated: !!token,
+        isAdmin: user?.role === "Admin",
+        isShipper: user?.role === "Shipper",
         login,
         logout,
     };
@@ -149,4 +161,19 @@ export function useAuth(): AuthContextValue {
 export function getStoredToken(): string | null {
     if (typeof window === "undefined") return null;
     return localStorage.getItem(TOKEN_KEY);
+}
+
+// ===========================================
+// Helper to get stored user info
+// ===========================================
+
+export function getStoredUser(): User | null {
+    if (typeof window === "undefined") return null;
+    const stored = localStorage.getItem(USER_KEY);
+    if (!stored) return null;
+    try {
+        return JSON.parse(stored);
+    } catch {
+        return null;
+    }
 }

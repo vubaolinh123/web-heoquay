@@ -17,6 +17,13 @@ export const API_ENDPOINTS = {
     warehouse: `${API_BASE_URL}/warehouse`,
     warehouseCreate: `${API_BASE_URL}/warehouse/create`,
     sendZaloCustomer: `${API_BASE_URL}/send-zalo-customer`,
+    // Order payment/checkout APIs
+    orderPayment: `${API_BASE_URL}/order-payment`,          // Get QR code for payment
+    orderCheckPaid: `${API_BASE_URL}/order-check-payed`,    // Check if order is paid
+    shipperConfirm: `${API_BASE_URL}/orders/shipper-confirm`,
+    // Placeholder endpoints
+    qrPayment: `${API_BASE_URL}/orders/qr-payment`,
+    users: `${API_BASE_URL}/users`,
 };
 
 /**

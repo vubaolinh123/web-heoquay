@@ -1,11 +1,17 @@
+"use client";
+
+import { useState } from "react";
 import { CollectOrderDay } from "@/lib/api/collectOrdersApi";
-import { Calendar, CalendarDays, Package, Building2 } from "lucide-react";
+import { DonHang } from "@/lib/types";
+import { Calendar, CalendarDays, Package, Building2, Copy, Check } from "lucide-react";
+import { generateOrdersSummaryText, copyToClipboard } from "@/lib/utils";
 import ItemRow from "../ItemRow";
 import styles from "./DateCard.module.css";
 
 interface DateCardProps {
     data: CollectOrderDay;
     branch?: string;
+    ordersForDate?: DonHang[];  // Full order details for copy feature
 }
 
 /**
@@ -29,11 +35,29 @@ function getTotalItems(items: CollectOrderDay["danhSachHang"]): number {
     return items.reduce((sum, item) => sum + item.tongSoLuong, 0);
 }
 
-export default function DateCard({ data, branch }: DateCardProps) {
+export default function DateCard({ data, branch, ordersForDate }: DateCardProps) {
     const { day, monthYear } = formatDate(data.ngayGiaoHang);
     const totalItems = getTotalItems(data.danhSachHang);
     const totalProducts = data.danhSachHang.length;
     const displayBranch = branch || data.chiNhanh;
+
+    const [isCopied, setIsCopied] = useState(false);
+    const [isCopying, setIsCopying] = useState(false);
+
+    const handleCopyClick = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (!ordersForDate || ordersForDate.length === 0 || isCopying) return;
+
+        setIsCopying(true);
+        const text = generateOrdersSummaryText(ordersForDate, data.ngayGiaoHang, displayBranch);
+        const success = await copyToClipboard(text);
+
+        if (success) {
+            setIsCopied(true);
+            setTimeout(() => setIsCopied(false), 2000);
+        }
+        setIsCopying(false);
+    };
 
     return (
         <div className={styles.card}>
@@ -64,8 +88,31 @@ export default function DateCard({ data, branch }: DateCardProps) {
                     <Package size={14} />
                     <span>{totalProducts} sản phẩm</span>
                 </div>
-                <div className={styles.statTotal}>
-                    <span>Tổng: {totalItems}</span>
+                <div className={styles.statsRight}>
+                    {/* Copy Button */}
+                    {ordersForDate && ordersForDate.length > 0 && (
+                        <button
+                            className={`${styles.copyBtn} ${isCopied ? styles.copyBtnSuccess : ""}`}
+                            onClick={handleCopyClick}
+                            disabled={isCopying}
+                            title="Sao chép tổng hợp đơn hàng"
+                        >
+                            {isCopied ? (
+                                <>
+                                    <Check size={14} />
+                                    <span>Đã copy!</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Copy size={14} />
+                                    <span>Copy</span>
+                                </>
+                            )}
+                        </button>
+                    )}
+                    <div className={styles.statTotal}>
+                        <span>Tổng: {totalItems}</span>
+                    </div>
                 </div>
             </div>
 
