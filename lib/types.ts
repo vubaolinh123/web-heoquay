@@ -7,6 +7,7 @@ export interface SanPham {
     maHang: string;        // Product code (e.g., "#H8")
     ghiChu?: string;       // Notes
     donGia?: number;       // Unit price
+    thanhTien?: number;    // Total price for this item (soLuong * donGia)
 }
 
 export interface KhachHang {

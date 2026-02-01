@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-
-const UPDATE_STATUS_API = "https://asia-82692522.n8nhosting.cloud/webhook/api/v1/heoquay/orders/update-status";
+import { API_ENDPOINTS } from "@/lib/api/config";
 
 /**
  * POST /api/orders/update-status
@@ -20,7 +19,8 @@ export async function POST(request: Request) {
 
         console.log("Updating order status:", { orderId, status });
 
-        const response = await fetch(UPDATE_STATUS_API, {
+        // Forward POST request to external API using env-based URL
+        const response = await fetch(API_ENDPOINTS.ordersUpdateStatus, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

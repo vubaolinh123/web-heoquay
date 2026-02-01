@@ -345,88 +345,99 @@ export default function OrderDetailModal({
                                 <thead>
                                     <tr>
                                         <th>Sản phẩm</th>
-                                        <th>Size</th>
                                         <th>SL</th>
-                                        <th>Giá</th>
+                                        <th>Đơn giá</th>
+                                        <th>Thành tiền</th>
                                         <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {donHang.sanPhams.map((sp) => (
-                                        <tr key={sp.id}>
-                                            <td>
-                                                <span className={styles.productName}>{sp.ten}</span>
-                                                {sp.maHang && (
-                                                    <span className={styles.productCode}> {sp.maHang}</span>
-                                                )}
-                                                {sp.ghiChu && (
-                                                    <div className={styles.productNote}>{sp.ghiChu}</div>
-                                                )}
-                                            </td>
-                                            <td>{sp.kichThuoc || "-"}</td>
-                                            <td>
-                                                {!isShippingFee(sp.ten) && editingId === sp.id ? (
-                                                    <input
-                                                        type="number"
-                                                        className={styles.editInput}
-                                                        value={editableProducts.get(sp.id)?.quantity ?? sp.soLuong}
-                                                        onChange={(e) => handleProductChange(sp.id, "quantity", Number(e.target.value))}
-                                                        min={1}
-                                                    />
-                                                ) : (
-                                                    sp.soLuong
-                                                )}
-                                            </td>
-                                            <td>
-                                                {!isShippingFee(sp.ten) && editingId === sp.id ? (
-                                                    <input
-                                                        type="number"
-                                                        className={styles.editInput}
-                                                        value={editableProducts.get(sp.id)?.price ?? (sp.donGia || 0)}
-                                                        onChange={(e) => handleProductChange(sp.id, "price", Number(e.target.value))}
-                                                        min={0}
-                                                    />
-                                                ) : (
-                                                    formatTien(sp.donGia || 0)
-                                                )}
-                                            </td>
-                                            <td>
-                                                {!isShippingFee(sp.ten) && (
-                                                    editingId === sp.id ? (
-                                                        <div className={styles.actionButtons}>
-                                                            <button
-                                                                className={styles.saveBtn}
-                                                                onClick={() => handleSaveProduct(sp)}
-                                                                disabled={savingId === sp.id}
-                                                                title="Lưu"
-                                                            >
-                                                                {savingId === sp.id ? (
-                                                                    <Loader2 size={14} className={styles.spin} />
-                                                                ) : (
-                                                                    <Save size={14} />
-                                                                )}
-                                                            </button>
-                                                            <button
-                                                                className={styles.cancelBtn}
-                                                                onClick={cancelEditing}
-                                                                title="Hủy"
-                                                            >
-                                                                <X size={14} />
-                                                            </button>
-                                                        </div>
+                                    {donHang.sanPhams.map((sp) => {
+                                        // Calculate item total (either from API or computed)
+                                        const editData = editableProducts.get(sp.id);
+                                        const currentQty = editingId === sp.id && editData ? editData.quantity : sp.soLuong;
+                                        const currentPrice = editingId === sp.id && editData ? editData.price : (sp.donGia || 0);
+                                        const itemTotal = sp.thanhTien || (currentQty * currentPrice);
+
+                                        return (
+                                            <tr key={sp.id}>
+                                                <td>
+                                                    {/* Product name is always read-only */}
+                                                    <span className={styles.productName}>{sp.ten}</span>
+                                                    {sp.maHang && (
+                                                        <span className={styles.productCode}> {sp.maHang}</span>
+                                                    )}
+                                                    {sp.ghiChu && (
+                                                        <div className={styles.productNote}>{sp.ghiChu}</div>
+                                                    )}
+                                                </td>
+                                                <td>
+                                                    {!isShippingFee(sp.ten) && editingId === sp.id ? (
+                                                        <input
+                                                            type="number"
+                                                            className={styles.editInput}
+                                                            value={editData?.quantity ?? sp.soLuong}
+                                                            onChange={(e) => handleProductChange(sp.id, "quantity", Number(e.target.value))}
+                                                            min={1}
+                                                        />
                                                     ) : (
-                                                        <button
-                                                            className={styles.editBtn}
-                                                            onClick={() => startEditing(sp)}
-                                                            title="Sửa"
-                                                        >
-                                                            <Edit2 size={14} />
-                                                        </button>
-                                                    )
-                                                )}
-                                            </td>
-                                        </tr>
-                                    ))}
+                                                        sp.soLuong
+                                                    )}
+                                                </td>
+                                                <td>
+                                                    {!isShippingFee(sp.ten) && editingId === sp.id ? (
+                                                        <input
+                                                            type="number"
+                                                            className={styles.editInput}
+                                                            value={editData?.price ?? (sp.donGia || 0)}
+                                                            onChange={(e) => handleProductChange(sp.id, "price", Number(e.target.value))}
+                                                            min={0}
+                                                        />
+                                                    ) : (
+                                                        formatTien(sp.donGia || 0)
+                                                    )}
+                                                </td>
+                                                <td className={styles.itemTotal}>
+                                                    {formatTien(editingId === sp.id ? (currentQty * currentPrice) : itemTotal)}
+                                                </td>
+                                                <td>
+                                                    {!isShippingFee(sp.ten) && (
+                                                        editingId === sp.id ? (
+                                                            <div className={styles.actionButtons}>
+                                                                <button
+                                                                    className={styles.saveBtn}
+                                                                    onClick={() => handleSaveProduct(sp)}
+                                                                    disabled={savingId === sp.id}
+                                                                    title="Lưu"
+                                                                >
+                                                                    {savingId === sp.id ? (
+                                                                        <Loader2 size={14} className={styles.spin} />
+                                                                    ) : (
+                                                                        <Save size={14} />
+                                                                    )}
+                                                                </button>
+                                                                <button
+                                                                    className={styles.cancelBtn}
+                                                                    onClick={cancelEditing}
+                                                                    title="Hủy"
+                                                                >
+                                                                    <X size={14} />
+                                                                </button>
+                                                            </div>
+                                                        ) : (
+                                                            <button
+                                                                className={styles.editBtn}
+                                                                onClick={() => startEditing(sp)}
+                                                                title="Sửa"
+                                                            >
+                                                                <Edit2 size={14} />
+                                                            </button>
+                                                        )
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
                                 </tbody>
                             </table>
 

@@ -34,6 +34,7 @@ export interface ApiOrder {
     maHoaDon: string;
     soPhieuXuat: string;
     chiNhanh: string;
+    ngayAm: string;                 // Lunar date from API (e.g., "10-12-2025" = Âm 10/12)
     ngayGiaoHang: string;           // Format: "DD-MM-YYYY"
     gioGiaoHang: string;            // Format: "HH:mm"
     hinhThucGiao: string;           // "Giao hàng" | "Đến lấy"

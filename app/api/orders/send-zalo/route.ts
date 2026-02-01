@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-
-const SEND_ZALO_API = "https://asia-82692522.n8nhosting.cloud/webhook/api/v1/heoquay/send-zalo-customer";
+import { API_ENDPOINTS } from "@/lib/api/config";
 
 /**
  * POST /api/orders/send-zalo
@@ -20,8 +19,8 @@ export async function POST(request: Request) {
 
         console.log("Sending Zalo to customer:", { orderId, phone_number });
 
-        // Forward POST request to n8n webhook
-        const response = await fetch(SEND_ZALO_API, {
+        // Forward POST request to external API using env-based URL
+        const response = await fetch(API_ENDPOINTS.sendZaloCustomer, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

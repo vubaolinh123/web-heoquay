@@ -11,9 +11,12 @@ export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ||
 export const API_ENDPOINTS = {
     login: `${API_BASE_URL}/login`,
     orders: `${API_BASE_URL}/orders`,
+    ordersUpdate: `${API_BASE_URL}/orders/update`,
+    ordersUpdateStatus: `${API_BASE_URL}/orders/update-status`,
     collectOrders: `${API_BASE_URL}/collect-orders`,
     warehouse: `${API_BASE_URL}/warehouse`,
     warehouseCreate: `${API_BASE_URL}/warehouse/create`,
+    sendZaloCustomer: `${API_BASE_URL}/send-zalo-customer`,
 };
 
 /**

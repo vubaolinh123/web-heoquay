@@ -110,10 +110,12 @@ export function formatLunarDate(date: Date): string {
 
 /**
  * Parse date string "DD-MM-YYYY" to Date object
+ * Sets time to noon to avoid timezone issues
  */
 function parseDate(dateStr: string): Date {
     const [day, month, year] = dateStr.split("-").map(Number);
-    return new Date(year, month - 1, day);
+    // Set to noon (12:00) to avoid timezone shifting the date
+    return new Date(year, month - 1, day, 12, 0, 0);
 }
 
 // ===========================================
@@ -136,6 +138,8 @@ function transformOrderItem(item: ApiOrderItem, index: number): SanPham {
         soLuong: item.soLuong || 1,
         maHang: item.maHang ? `#${item.maHang}` : "",
         ghiChu: item.ghiChu || undefined,
+        donGia: item.donGia || 0,
+        thanhTien: item.thanhTien || (item.soLuong || 1) * (item.donGia || 0),
     };
 }
 
@@ -145,7 +149,16 @@ function transformOrderItem(item: ApiOrderItem, index: number): SanPham {
 export function transformApiOrder(apiOrder: ApiOrder): DonHang {
     // Parse date with fallback to current date if invalid
     const ngay = apiOrder.ngayGiaoHang ? parseDate(apiOrder.ngayGiaoHang) : new Date();
-    const ngayAm = formatLunarDate(ngay);
+
+    // Use lunar date from API directly, fallback to calculated if not provided
+    let ngayAm: string;
+    if (apiOrder.ngayAm) {
+        // API returns format "DD-MM-YYYY", extract day/month for display
+        const [day, month] = apiOrder.ngayAm.split("-");
+        ngayAm = `Âm ${day}/${month}`;
+    } else {
+        ngayAm = formatLunarDate(ngay);
+    }
 
     // Safely get items array
     const danhSachHang = apiOrder.danhSachHang || [];
