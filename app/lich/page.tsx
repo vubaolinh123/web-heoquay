@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { CalendarViewMode, DonHang } from "@/lib/types";
 import { useOrders } from "@/contexts";
@@ -32,6 +32,11 @@ export default function LichPage() {
 
     // Toast state for auto-refresh notification
     const [showToast, setShowToast] = useState(false);
+
+    // Fetch orders on mount (since OrdersContext no longer auto-fetches)
+    useEffect(() => {
+        refetch();
+    }, [refetch]);
 
     // Auto-refresh hook - refresh every 5 minutes (configurable)
     const { countdown, resetCountdown } = useAutoRefresh(refetch, {

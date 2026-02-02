@@ -120,9 +120,7 @@ export const ordersApi = {
         try {
             const response = await fetch("/api/orders/send-zalo", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: getHeaders(),
                 body: JSON.stringify({ orderId, phone_number: phoneNumber }),
             });
 

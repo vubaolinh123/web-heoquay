@@ -19,11 +19,15 @@ export async function POST(request: Request) {
 
         console.log("Sending Zalo to customer:", { orderId, phone_number });
 
+        // Get auth token from request
+        const authToken = request.headers.get("Authorization");
+
         // Forward POST request to external API using env-based URL
         const response = await fetch(API_ENDPOINTS.sendZaloCustomer, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                ...(authToken ? { "Authorization": authToken } : {}),
             },
             body: JSON.stringify({ orderId, phone_number }),
         });
@@ -31,7 +35,8 @@ export async function POST(request: Request) {
         const data = await response.json();
         console.log("Send Zalo response:", data);
 
-        if (!response.ok || data.code >= 400) {
+        // Only check response.ok - API may not return code field on success
+        if (!response.ok) {
             return NextResponse.json(
                 { error: "1", message: data.message || "Không thể gửi Zalo" },
                 { status: response.status || 500 }
