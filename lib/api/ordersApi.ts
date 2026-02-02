@@ -266,9 +266,12 @@ export interface QRPaymentResponse {
  * Check paid response
  */
 export interface CheckPaidResponse {
-    isPaid: boolean;
-    orderId: string;
+    isPaid?: boolean;
+    paid?: boolean;
+    status?: string;
+    orderId?: string;
     paidAt?: string;
     amount?: number;
+    message?: string;
 }
 

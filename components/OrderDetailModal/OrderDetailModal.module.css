@@ -981,3 +981,24 @@
   background: #86efac !important;
   cursor: not-allowed;
 }
+
+/* Check Payment Button */
+.checkPaymentBtn {
+  background: #0ea5e9 !important;
+  color: white !important;
+}
+
+.checkPaymentBtn:hover:not(:disabled) {
+  background: #0284c7 !important;
+}
+
+/* Success Message */
+.successMessage {
+  color: #16a34a;
+  font-size: var(--font-size-sm);
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: #f0fdf4;
+  border-radius: var(--radius-sm);
+  border: 1px solid #bbf7d0;
+}

@@ -91,6 +91,11 @@ export default function OrderDetailModal({
     } | null>(null);
     const [isLoadingQR, setIsLoadingQR] = useState(false);
 
+    // Check payment state
+    const [isCheckingPayment, setIsCheckingPayment] = useState(false);
+    const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
+    const [paymentError, setPaymentError] = useState<string | null>(null);
+
     // Check if can edit post-roast products (only for Chi nhánh 1 and NOT shipper)
     const canEditPostRoast = useMemo(() => {
         // Shipper cannot edit post-roast products
@@ -378,6 +383,30 @@ export default function OrderDetailModal({
         }
     };
 
+    // Handle check payment status
+    const handleCheckPayment = async () => {
+        if (isCheckingPayment) return;
+
+        setIsCheckingPayment(true);
+        setPaymentError(null);
+        setPaymentStatus(null);
+
+        try {
+            const data = await ordersApi.checkOrderPaid(donHang.maDon);
+            // Show payment status from API response
+            if (data.isPaid || data.paid || data.status === "paid") {
+                setPaymentStatus("✓ Đơn hàng đã được thanh toán!");
+            } else {
+                setPaymentStatus("Đơn hàng chưa thanh toán");
+            }
+            setTimeout(() => setPaymentStatus(null), 5000);
+        } catch (error) {
+            setPaymentError(error instanceof Error ? error.message : "Không thể kiểm tra thanh toán");
+        } finally {
+            setIsCheckingPayment(false);
+        }
+    };
+
     return (
         <div className={styles.overlay} onClick={onClose}>
             <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
@@ -493,9 +522,26 @@ export default function OrderDetailModal({
                                     <QrCode size={16} />
                                     Lấy QR chuyển khoản
                                 </button>
+
+                                {/* Check payment button */}
+                                <button
+                                    className={`${styles.actionBtn} ${styles.checkPaymentBtn}`}
+                                    onClick={handleCheckPayment}
+                                    disabled={isCheckingPayment}
+                                >
+                                    {isCheckingPayment ? (
+                                        <Loader2 size={16} className={styles.loadingSpinner} />
+                                    ) : (
+                                        <>
+                                            ✓ Check thanh toán
+                                        </>
+                                    )}
+                                </button>
                             </div>
                             {confirmError && <div className={styles.errorMessage}>{confirmError}</div>}
                             {zaloError && <div className={styles.errorMessage}>{zaloError}</div>}
+                            {paymentError && <div className={styles.errorMessage}>{paymentError}</div>}
+                            {paymentStatus && <div className={styles.successMessage}>{paymentStatus}</div>}
                         </div>
                     </div>
 
