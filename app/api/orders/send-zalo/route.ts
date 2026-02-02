@@ -32,18 +32,29 @@ export async function POST(request: Request) {
             body: JSON.stringify({ orderId, phone_number }),
         });
 
-        const data = await response.json();
-        console.log("Send Zalo response:", data);
+        // Handle response - may return empty body
+        const responseText = await response.text();
+        let data = null;
+        if (responseText) {
+            try {
+                data = JSON.parse(responseText);
+            } catch {
+                // Response is not JSON, treat as success if status is ok
+                console.log("Send Zalo response (non-JSON):", responseText);
+            }
+        }
+        console.log("Send Zalo response:", data || "empty response");
 
         // Only check response.ok - API may not return code field on success
         if (!response.ok) {
             return NextResponse.json(
-                { error: "1", message: data.message || "Không thể gửi Zalo" },
+                { error: "1", message: data?.message || "Không thể gửi Zalo" },
                 { status: response.status || 500 }
             );
         }
 
-        return NextResponse.json(data);
+        // Return success even if response was empty
+        return NextResponse.json(data || { error: "0", message: "Gửi Zalo thành công" });
     } catch (error) {
         console.error("Send Zalo API error:", error);
         return NextResponse.json(
