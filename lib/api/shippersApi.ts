@@ -10,6 +10,12 @@ export interface Shipper {
 }
 
 /**
+ * In-memory cache for shippers list
+ * Will be cleared when page is refreshed (F5)
+ */
+let shippersCache: Shipper[] | null = null;
+
+/**
  * Get auth headers with token and role
  */
 function getHeaders(): HeadersInit {
@@ -27,11 +33,19 @@ function getHeaders(): HeadersInit {
  */
 export const shippersApi = {
     /**
-     * Fetch all shippers from the API
+     * Fetch all shippers from the API (with caching)
+     * @param forceRefresh - If true, bypass cache and fetch fresh data
      * @returns Promise<Shipper[]> - Array of shippers
      */
-    getShippers: async (): Promise<Shipper[]> => {
+    getShippers: async (forceRefresh = false): Promise<Shipper[]> => {
+        // Return cached data if available and not forcing refresh
+        if (!forceRefresh && shippersCache !== null) {
+            console.log("Returning cached shippers");
+            return shippersCache;
+        }
+
         try {
+            console.log("Fetching shippers from API");
             const response = await fetch("/api/shippers", {
                 headers: getHeaders(),
             });
@@ -42,11 +56,20 @@ export const shippersApi = {
                 throw new Error(data.message || "Không thể lấy danh sách shipper");
             }
 
-            return data.data || [];
+            // Cache the result
+            shippersCache = data.data || [];
+            return shippersCache!;
         } catch (error) {
             console.error("Get shippers error:", error);
             throw error;
         }
     },
-};
 
+    /**
+     * Clear the shippers cache
+     * Call this when you need to force a refresh on next getShippers call
+     */
+    clearCache: () => {
+        shippersCache = null;
+    },
+};

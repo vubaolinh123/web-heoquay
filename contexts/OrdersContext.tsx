@@ -87,18 +87,15 @@ export function OrdersProvider({ children }: OrdersProviderProps) {
         return map;
     }, [orders]);
 
-    // Fetch when authenticated
+    // NOTE: Auto-fetch is DISABLED to prevent duplicate API calls.
+    // Pages should call refetch() manually when they need data.
+    // This prevents the issue where OrdersContext fetches AND page also fetches.
     useEffect(() => {
-        // Wait for auth to finish loading
-        if (authLoading) return;
-
-        // Only fetch if authenticated
-        if (isAuthenticated) {
-            fetchOrders();
-        } else {
+        // Only set loading to false when auth is ready
+        if (!authLoading) {
             setIsLoading(false);
         }
-    }, [authLoading, isAuthenticated, fetchOrders]);
+    }, [authLoading]);
 
     const value: OrdersContextValue = {
         orders,
