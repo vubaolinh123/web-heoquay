@@ -203,7 +203,20 @@ export default function KitchenSlipModal({
                                     <td style={{ border: '1px solid #1e293b', padding: '8px 10px', textAlign: 'center', fontWeight: 700, verticalAlign: 'top' }}>
                                         {order.sanPhams.filter(p => !isShippingFee(p.ten)).reduce((sum, p) => sum + p.soLuong, 0)}
                                     </td>
-                                    <td style={{ border: '1px solid #1e293b', padding: '8px 10px', verticalAlign: 'top' }}>{order.ghiChu || ""}</td>
+                                    <td style={{ border: '1px solid #1e293b', padding: '8px 10px', verticalAlign: 'top' }}>
+                                        {/* Product-level notes */}
+                                        {order.sanPhams.filter(p => !isShippingFee(p.ten) && p.ghiChu).map((p, i) => (
+                                            <div key={i} style={{ marginBottom: '4px' }}>
+                                                {p.ghiChu}
+                                            </div>
+                                        ))}
+                                        {/* Order-level note */}
+                                        {order.ghiChu && (
+                                            <div style={{ marginTop: order.sanPhams.some(p => p.ghiChu) ? '6px' : '0', paddingTop: order.sanPhams.some(p => p.ghiChu) ? '6px' : '0', borderTop: order.sanPhams.some(p => p.ghiChu) ? '1px dashed #94a3b8' : 'none' }}>
+                                                {order.ghiChu}
+                                            </div>
+                                        )}
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
