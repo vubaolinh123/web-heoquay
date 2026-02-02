@@ -460,8 +460,8 @@ export default function OrderDetailModal({
                                                 {isLoadingShippers ? "Đang tải..." : "Chọn shipper"}
                                             </option>
                                             {shippers.map((shipper) => (
-                                                <option key={shipper.id} value={shipper.name}>
-                                                    {shipper.name}
+                                                <option key={shipper.userName} value={shipper.userName}>
+                                                    {shipper.userName}
                                                 </option>
                                             ))}
                                         </select>

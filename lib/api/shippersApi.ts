@@ -4,10 +4,9 @@ import { getStoredToken } from "@/contexts";
  * Shipper type from API
  */
 export interface Shipper {
-    id: string;
-    name: string;
-    phone?: string;
-    active?: boolean;
+    userName: string;
+    phoneNumber?: string;
+    role?: string;
 }
 
 /**
@@ -48,3 +47,4 @@ export const shippersApi = {
         }
     },
 };
+
