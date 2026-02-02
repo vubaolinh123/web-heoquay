@@ -1002,3 +1002,20 @@
   border-radius: var(--radius-sm);
   border: 1px solid #bbf7d0;
 }
+
+/* Payment Status Badges */
+.paymentPaid {
+  background: #dcfce7 !important;
+  color: #16a34a !important;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.paymentUnpaid {
+  background: #fef3c7 !important;
+  color: #d97706 !important;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+}

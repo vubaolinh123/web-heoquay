@@ -639,6 +639,14 @@ export default function OrderDetailModal({
                                         {donHang.phuongThucThanhToan === "chuyen_khoan" ? "Chuyển khoản" : "Tiền mặt"}
                                     </span>
                                 </div>
+                                {donHang.trangThaiThanhToan && (
+                                    <div className={styles.infoRow}>
+                                        <span className={styles.infoLabel}>Trạng thái TT:</span>
+                                        <span className={`${styles.infoValue} ${donHang.trangThaiThanhToan === "Đã thanh toán" ? styles.paymentPaid : styles.paymentUnpaid}`}>
+                                            {donHang.trangThaiThanhToan}
+                                        </span>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

@@ -38,6 +38,7 @@ export interface DonHang {
     hinhThucGiao?: string; // Delivery method (e.g., "Giao hàng", "Đến lấy")
     tienDatCoc?: number;   // Deposit amount
     shipperNhanDon?: string; // Shipper who confirmed this order
+    trangThaiThanhToan?: string; // Payment status (e.g., "Đã thanh toán", "Chưa thanh toán")
 }
 
 export interface DonHangTheoNgay {

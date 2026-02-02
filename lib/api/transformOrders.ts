@@ -203,6 +203,7 @@ export function transformApiOrder(apiOrder: ApiOrder): DonHang {
         hinhThucGiao: apiOrder.hinhThucGiao || "",
         shipperNhanDon: apiOrder.nguoiGiaoHang || undefined,
         tienDatCoc: apiOrder.daCoc || undefined,
+        trangThaiThanhToan: apiOrder.trangThaiThanhToan || undefined,
     };
 }
 

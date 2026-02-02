@@ -46,6 +46,7 @@ export interface ApiOrder {
     diaChi: string;
     tongTien: number;
     daCoc?: number;                 // Deposit amount
+    trangThaiThanhToan?: string;    // "Đã thanh toán" | "Chưa thanh toán"
     danhSachHang: ApiOrderItem[];
 }
 
