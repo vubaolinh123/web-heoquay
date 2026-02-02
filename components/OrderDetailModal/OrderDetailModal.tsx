@@ -493,26 +493,6 @@ export default function OrderDetailModal({
                                     <QrCode size={16} />
                                     Lấy QR chuyển khoản
                                 </button>
-
-                                {/* Send Zalo - Admin only */}
-                                {isAdmin && (
-                                    <button
-                                        className={`${styles.actionBtn} ${styles.zaloBtn}`}
-                                        onClick={handleSendZalo}
-                                        disabled={isSendingZalo || zaloSuccess}
-                                    >
-                                        {isSendingZalo ? (
-                                            <Loader2 size={16} className={styles.loadingSpinner} />
-                                        ) : zaloSuccess ? (
-                                            <>✓ Đã gửi</>
-                                        ) : (
-                                            <>
-                                                <MessageCircle size={16} />
-                                                Gửi Zalo
-                                            </>
-                                        )}
-                                    </button>
-                                )}
                             </div>
                             {confirmError && <div className={styles.errorMessage}>{confirmError}</div>}
                             {zaloError && <div className={styles.errorMessage}>{zaloError}</div>}

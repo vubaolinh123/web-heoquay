@@ -1,4 +1,4 @@
-import { getStoredToken } from "@/contexts";
+import { getStoredToken, getStoredUser } from "@/contexts";
 
 // ===========================================
 // API Types
@@ -41,9 +41,11 @@ export interface CollectOrdersResponse {
 
 function getHeaders(): HeadersInit {
     const token = getStoredToken();
+    const user = getStoredUser();
     return {
         "Content-Type": "application/json",
         ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+        ...(user?.role ? { "X-User-Role": user.role } : {}),
     };
 }
 
