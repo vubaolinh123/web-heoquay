@@ -99,7 +99,7 @@ export function groupCollectOrdersByDate(
         const [dB, mB, yB] = b.ngayGiaoHang.split('-').map(Number);
         const dateA = new Date(yA, mA - 1, dA);
         const dateB = new Date(yB, mB - 1, dB);
-        return dateB.getTime() - dateA.getTime();
+        return dateA.getTime() - dateB.getTime();
     });
 
     return result;

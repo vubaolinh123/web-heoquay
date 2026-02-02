@@ -194,14 +194,20 @@ export const ordersApi = {
      * Shipper confirms/accepts an order
      * @param orderId - Order ID
      * @param shipper - Shipper name
+     * @param sendBy - Optional, set to "Admin" when admin assigns shipper
      * @returns Promise<boolean> - True if successful
      */
-    shipperConfirm: async (orderId: string, shipper: string): Promise<boolean> => {
+    shipperConfirm: async (orderId: string, shipper: string, sendBy?: string): Promise<boolean> => {
         try {
+            const body: { orderId: string; shipper: string; sendBy?: string } = { orderId, shipper };
+            if (sendBy) {
+                body.sendBy = sendBy;
+            }
+
             const response = await fetch("/api/orders/shipper-confirm", {
                 method: "POST",
                 headers: getHeaders(),
-                body: JSON.stringify({ orderId, shipper }),
+                body: JSON.stringify(body),
             });
 
             const data = await response.json();

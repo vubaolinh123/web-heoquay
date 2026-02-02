@@ -21,6 +21,7 @@ export const API_ENDPOINTS = {
     orderPayment: `${API_BASE_URL}/order-payment`,          // Get QR code for payment
     orderCheckPaid: `${API_BASE_URL}/order-check-payed`,    // Check if order is paid
     shipperConfirm: `${API_BASE_URL}/shipper-confirm`,
+    shippers: `${API_BASE_URL}/shippers`,
     // Placeholder endpoints
     qrPayment: `${API_BASE_URL}/orders/qr-payment`,
     users: `${API_BASE_URL}/users`,

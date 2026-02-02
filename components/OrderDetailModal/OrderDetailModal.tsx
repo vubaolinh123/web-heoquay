@@ -5,6 +5,7 @@ import { X, Phone, MapPin, Calendar, Clock, Building2, Loader2, Edit2, Save, Plu
 import { DonHang, TrangThaiDon, SanPham } from "@/lib/types";
 import { formatTien } from "@/lib/mockData";
 import { ordersApi } from "@/lib/api";
+import { shippersApi, Shipper } from "@/lib/api/shippersApi";
 import { useAuth } from "@/contexts/AuthContext";
 import styles from "./OrderDetailModal.module.css";
 
@@ -71,6 +72,11 @@ export default function OrderDetailModal({
     const [confirmSuccess, setConfirmSuccess] = useState(false);
     const [confirmError, setConfirmError] = useState<string | null>(null);
 
+    // Admin shipper selection state
+    const [shippers, setShippers] = useState<Shipper[]>([]);
+    const [selectedShipper, setSelectedShipper] = useState<string>("");
+    const [isLoadingShippers, setIsLoadingShippers] = useState(false);
+
     // QR Payment state
     const [showQRModal, setShowQRModal] = useState(false);
     const [qrData, setQrData] = useState<{
@@ -102,6 +108,17 @@ export default function OrderDetailModal({
             normalized === "1" ||
             branch.trim().endsWith("1");
     }, [donHang.chiNhanh, isShipper]);
+
+    // Fetch shippers for Admin
+    useEffect(() => {
+        if (isAdmin) {
+            setIsLoadingShippers(true);
+            shippersApi.getShippers()
+                .then((data) => setShippers(data))
+                .catch((err) => console.error("Failed to load shippers:", err))
+                .finally(() => setIsLoadingShippers(false));
+        }
+    }, [isAdmin]);
 
     // Prevent body scroll when modal is open
     useEffect(() => {
@@ -265,7 +282,7 @@ export default function OrderDetailModal({
         }
     };
 
-    // Handle shipper confirm order
+    // Handle shipper confirm order (for Shipper self-confirm)
     const handleShipperConfirm = async () => {
         if (isConfirmingOrder || !user?.userName) return;
 
@@ -293,6 +310,40 @@ export default function OrderDetailModal({
             }
         } catch (error) {
             setConfirmError(error instanceof Error ? error.message : "Không thể nhận đơn");
+        } finally {
+            setIsConfirmingOrder(false);
+        }
+    };
+
+    // Handle admin assign shipper
+    const handleAdminAssignShipper = async () => {
+        if (isConfirmingOrder || !selectedShipper) return;
+
+        setIsConfirmingOrder(true);
+        setConfirmError(null);
+        setConfirmSuccess(false);
+
+        try {
+            const response = await fetch("/api/orders/shipper-confirm", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    orderId: donHang.maDon,
+                    shipper: selectedShipper,
+                    sendBy: "Admin",
+                }),
+            });
+
+            const data = await response.json();
+            if (data.error === "0") {
+                setConfirmSuccess(true);
+                setTimeout(() => setConfirmSuccess(false), 3000);
+                if (onOrderUpdate) await onOrderUpdate();
+            } else {
+                setConfirmError(data.message || "Có lỗi xảy ra");
+            }
+        } catch (error) {
+            setConfirmError(error instanceof Error ? error.message : "Không thể gán shipper");
         } finally {
             setIsConfirmingOrder(false);
         }
@@ -394,6 +445,43 @@ export default function OrderDetailModal({
                                             </>
                                         )}
                                     </button>
+                                )}
+
+                                {/* Admin assign shipper */}
+                                {isAdmin && (
+                                    <div className={styles.adminShipperSelect}>
+                                        <select
+                                            className={styles.shipperDropdown}
+                                            value={selectedShipper}
+                                            onChange={(e) => setSelectedShipper(e.target.value)}
+                                            disabled={isLoadingShippers || isConfirmingOrder}
+                                        >
+                                            <option value="">
+                                                {isLoadingShippers ? "Đang tải..." : "Chọn shipper"}
+                                            </option>
+                                            {shippers.map((shipper) => (
+                                                <option key={shipper.id} value={shipper.name}>
+                                                    {shipper.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <button
+                                            className={`${styles.actionBtn} ${styles.assignBtn}`}
+                                            onClick={handleAdminAssignShipper}
+                                            disabled={!selectedShipper || isConfirmingOrder || confirmSuccess}
+                                        >
+                                            {isConfirmingOrder ? (
+                                                <Loader2 size={16} className={styles.loadingSpinner} />
+                                            ) : confirmSuccess ? (
+                                                <>✓ Đã gán</>
+                                            ) : (
+                                                <>
+                                                    <UserCheck size={16} />
+                                                    Gán shipper
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
                                 )}
 
                                 {/* QR Payment button - for everyone */}
