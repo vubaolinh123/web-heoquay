@@ -213,12 +213,12 @@ export function generateOrdersSummaryText(
         const heoQuantities: number[] = [];
         for (const item of heoProducts) {
             text += `   • ${item.name}: ${item.quantity} ${item.unit}\n`;
-            // Add notes on separate lines
-            if (item.notes.length > 0) {
-                for (const note of item.notes) {
-                    text += `      - ${note}\n`;
-                }
-            }
+            // TODO: Temporarily commented out notes display
+            // if (item.notes.length > 0) {
+            //     for (const note of item.notes) {
+            //         text += `      - ${note}\n`;
+            //     }
+            // }
             heoQuantities.push(item.quantity);
         }
 
@@ -234,12 +234,12 @@ export function generateOrdersSummaryText(
         text += `\n🥢 PHỤ PHẨM:\n`;
         for (const item of sideProducts) {
             text += `   • ${item.name}: ${item.quantity} ${item.unit}\n`;
-            // Add notes on separate lines
-            if (item.notes.length > 0) {
-                for (const note of item.notes) {
-                    text += `      - ${note}\n`;
-                }
-            }
+            // TODO: Temporarily commented out notes display
+            // if (item.notes.length > 0) {
+            //     for (const note of item.notes) {
+            //         text += `      - ${note}\n`;
+            //     }
+            // }
         }
     }
 

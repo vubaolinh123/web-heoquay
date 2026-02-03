@@ -48,3 +48,18 @@ export function getTokenFromRequest(request: Request): string | null {
     }
     return null;
 }
+
+/**
+ * Get headers for proxy requests including Authorization and x-role
+ * Use this in API route handlers to forward auth headers to external API
+ */
+export function getProxyHeaders(request: Request): HeadersInit {
+    const authToken = request.headers.get("Authorization");
+    const xRole = request.headers.get("X-User-Role");
+
+    return {
+        "Content-Type": "application/json",
+        ...(authToken ? { "Authorization": authToken } : {}),
+        ...(xRole ? { "x-role": xRole } : {}),
+    };
+}

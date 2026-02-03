@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { API_ENDPOINTS } from "@/lib/api/config";
+import { API_ENDPOINTS, getProxyHeaders } from "@/lib/api/config";
 
 /**
  * POST /api/orders/update-status
@@ -8,37 +8,20 @@ import { API_ENDPOINTS } from "@/lib/api/config";
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { orderId, status } = body;
 
-        if (!orderId || !status) {
-            return NextResponse.json(
-                { error: "1", message: "orderId và status là bắt buộc" },
-                { status: 400 }
-            );
-        }
+        console.log("Updating order status:", body);
 
-        console.log("Updating order status:", { orderId, status });
-
-        // Forward POST request to external API using env-based URL
+        // Forward POST request to external API with auth and x-role headers
         const response = await fetch(API_ENDPOINTS.ordersUpdateStatus, {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ orderId, status }),
+            headers: getProxyHeaders(request),
+            body: JSON.stringify(body),
         });
 
+        // Return full response from original API
         const data = await response.json();
         console.log("Update status response:", data);
-
-        if (!response.ok) {
-            return NextResponse.json(
-                { error: "1", message: data.message || "Không thể cập nhật trạng thái" },
-                { status: response.status }
-            );
-        }
-
-        return NextResponse.json(data);
+        return NextResponse.json(data, { status: response.status });
     } catch (error) {
         console.error("Update status API error:", error);
         return NextResponse.json(

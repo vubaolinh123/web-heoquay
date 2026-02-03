@@ -1,22 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { API_ENDPOINTS, getAuthHeaders, getTokenFromRequest } from "@/lib/api/config";
+import { API_ENDPOINTS, getProxyHeaders } from "@/lib/api/config";
 
 /**
  * POST /api/orders/check-paid
  * Check if an order has been paid
+ * Logic: error=0 means paid, otherwise unpaid
  */
 export async function POST(request: NextRequest) {
     try {
-        // Get token from request
-        const token = getTokenFromRequest(request);
-
-        if (!token) {
-            return NextResponse.json(
-                { error: "1", message: "Unauthorized - Please login" },
-                { status: 401 }
-            );
-        }
-
         const body = await request.json();
         const { orderId } = body;
 
@@ -29,34 +20,27 @@ export async function POST(request: NextRequest) {
 
         console.log("Checking payment for order:", orderId);
 
-        // Call external API to check payment status with auth token
+        // Call external API with auth and x-role headers
         const response = await fetch(API_ENDPOINTS.orderCheckPaid, {
             method: "POST",
-            headers: getAuthHeaders(token),
+            headers: getProxyHeaders(request),
             body: JSON.stringify({ orderId }),
         });
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error("Check paid API Error:", response.status, errorText);
-            return NextResponse.json(
-                { error: "1", message: errorText || "Không thể kiểm tra thanh toán" },
-                { status: response.status }
-            );
-        }
-
+        // Return full response from original API
         const data = await response.json();
         console.log("Check paid response:", data);
 
+        // Logic: error=0 means paid, otherwise unpaid
+        // Add isPaid field based on error value
         return NextResponse.json({
-            error: "0",
-            message: "Thành công",
-            data: data.data || data,
-        });
+            ...data,
+            isPaid: data.error === "0" || data.error === 0,
+        }, { status: response.status });
     } catch (error) {
         console.error("Check paid error:", error);
         return NextResponse.json(
-            { error: "1", message: "Có lỗi xảy ra khi kiểm tra thanh toán" },
+            { error: "1", message: "Có lỗi xảy ra khi kiểm tra thanh toán", isPaid: false },
             { status: 500 }
         );
     }

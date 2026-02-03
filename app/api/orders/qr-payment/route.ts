@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { API_ENDPOINTS, getAuthHeaders, getTokenFromRequest } from "@/lib/api/config";
+import { API_ENDPOINTS, getProxyHeaders } from "@/lib/api/config";
 
 /**
  * POST /api/orders/qr-payment
@@ -8,16 +8,6 @@ import { API_ENDPOINTS, getAuthHeaders, getTokenFromRequest } from "@/lib/api/co
  */
 export async function POST(request: NextRequest) {
     try {
-        // Get token from request
-        const token = getTokenFromRequest(request);
-
-        if (!token) {
-            return NextResponse.json(
-                { error: "1", message: "Unauthorized - Please login" },
-                { status: 401 }
-            );
-        }
-
         const body = await request.json();
         const { orderId } = body;
 
@@ -30,44 +20,27 @@ export async function POST(request: NextRequest) {
 
         console.log("Getting QR payment for order:", orderId);
 
-        // Call external API to get QR code with auth token
+        // Call external API with auth and x-role headers
         const response = await fetch(API_ENDPOINTS.orderPayment, {
             method: "POST",
-            headers: getAuthHeaders(token),
+            headers: getProxyHeaders(request),
             body: JSON.stringify({ orderId }),
         });
 
-        // Check if response is JSON
+        // Handle non-JSON response (raw image data)
         const contentType = response.headers.get("content-type");
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error("QR payment API Error:", response.status, errorText);
-            return NextResponse.json(
-                { error: "1", message: errorText || "Không thể lấy mã QR" },
-                { status: response.status }
-            );
-        }
-
-        // If response is not JSON, it might be the raw image data
         if (contentType && !contentType.includes("application/json")) {
-            // Response is raw data (possibly base64 string or image)
             const text = await response.text();
             return NextResponse.json({
-                error: "0",
-                message: "Thành công",
-                data: { qrBase64: text, orderId },
-            });
+                qrBase64: text,
+                orderId,
+            }, { status: response.status });
         }
 
+        // Return full JSON response from original API
         const data = await response.json();
         console.log("QR payment response received");
-
-        return NextResponse.json({
-            error: "0",
-            message: "Thành công",
-            data: data.data || data,
-        });
+        return NextResponse.json(data, { status: response.status });
     } catch (error) {
         console.error("QR payment error:", error);
         return NextResponse.json(

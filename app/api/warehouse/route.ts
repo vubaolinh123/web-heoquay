@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { API_ENDPOINTS, getAuthHeaders, getTokenFromRequest } from "@/lib/api/config";
+import { API_ENDPOINTS, getProxyHeaders } from "@/lib/api/config";
 
 /**
  * GET /api/warehouse
@@ -7,32 +7,16 @@ import { API_ENDPOINTS, getAuthHeaders, getTokenFromRequest } from "@/lib/api/co
  */
 export async function GET(request: Request) {
     try {
-        const token = getTokenFromRequest(request);
-        if (!token) {
-            return NextResponse.json(
-                { error: "1", message: "Unauthorized - Please login" },
-                { status: 401 }
-            );
-        }
-
         console.log("Fetching warehouse from:", API_ENDPOINTS.warehouse);
 
         const response = await fetch(API_ENDPOINTS.warehouse, {
             method: "GET",
-            headers: getAuthHeaders(token),
+            headers: getProxyHeaders(request),
         });
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error("Warehouse GET Error:", response.status, errorText);
-            return NextResponse.json(
-                { error: "1", message: errorText || "Failed to fetch warehouse" },
-                { status: response.status }
-            );
-        }
-
+        // Return full response from original API
         const data = await response.json();
-        return NextResponse.json(data);
+        return NextResponse.json(data, { status: response.status });
     } catch (error) {
         console.error("Warehouse API error:", error);
         return NextResponse.json(
@@ -48,34 +32,18 @@ export async function GET(request: Request) {
  */
 export async function DELETE(request: Request) {
     try {
-        const token = getTokenFromRequest(request);
-        if (!token) {
-            return NextResponse.json(
-                { error: "1", message: "Unauthorized - Please login" },
-                { status: 401 }
-            );
-        }
-
         const body = await request.json();
         console.log("Deleting warehouse item:", body);
 
         const response = await fetch(API_ENDPOINTS.warehouse, {
             method: "DELETE",
-            headers: getAuthHeaders(token),
+            headers: getProxyHeaders(request),
             body: JSON.stringify(body),
         });
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error("Warehouse DELETE Error:", response.status, errorText);
-            return NextResponse.json(
-                { error: "1", message: errorText || "Failed to delete" },
-                { status: response.status }
-            );
-        }
-
+        // Return full response from original API
         const data = await response.json();
-        return NextResponse.json(data);
+        return NextResponse.json(data, { status: response.status });
     } catch (error) {
         console.error("Warehouse DELETE error:", error);
         return NextResponse.json(

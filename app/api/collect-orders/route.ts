@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { API_ENDPOINTS, getAuthHeaders, getTokenFromRequest } from "@/lib/api/config";
+import { API_ENDPOINTS, getProxyHeaders } from "@/lib/api/config";
 
 /**
  * GET /api/collect-orders
@@ -7,34 +7,18 @@ import { API_ENDPOINTS, getAuthHeaders, getTokenFromRequest } from "@/lib/api/co
  */
 export async function GET(request: Request) {
     try {
-        const token = getTokenFromRequest(request);
-
-        if (!token) {
-            return NextResponse.json(
-                { error: "1", message: "Unauthorized - Please login" },
-                { status: 401 }
-            );
-        }
-
         console.log("Fetching collect-orders from:", API_ENDPOINTS.collectOrders);
 
+        // Forward request with auth and x-role headers
         const response = await fetch(API_ENDPOINTS.collectOrders, {
             method: "GET",
-            headers: getAuthHeaders(token),
+            headers: getProxyHeaders(request),
         });
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error("Collect Orders API Error:", response.status, errorText);
-            return NextResponse.json(
-                { error: "1", message: errorText || "Failed to fetch collect orders" },
-                { status: response.status }
-            );
-        }
-
+        // Return full response from original API
         const data = await response.json();
-        console.log("Collect orders fetched, days count:", Array.isArray(data.data) ? data.data.length : "N/A");
-        return NextResponse.json(data);
+        console.log("Collect orders fetched, status:", response.status);
+        return NextResponse.json(data, { status: response.status });
     } catch (error) {
         console.error("Collect Orders API error:", error);
         return NextResponse.json(

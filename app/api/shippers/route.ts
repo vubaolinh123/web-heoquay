@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { API_ENDPOINTS, getAuthHeaders, getTokenFromRequest } from "@/lib/api/config";
+import { API_ENDPOINTS, getProxyHeaders } from "@/lib/api/config";
 
 /**
  * GET /api/shippers
@@ -7,41 +7,18 @@ import { API_ENDPOINTS, getAuthHeaders, getTokenFromRequest } from "@/lib/api/co
  */
 export async function GET(request: NextRequest) {
     try {
-        // Get token from request
-        const token = getTokenFromRequest(request);
-
-        if (!token) {
-            return NextResponse.json(
-                { error: "1", message: "Unauthorized - Please login" },
-                { status: 401 }
-            );
-        }
-
         console.log("Fetching shippers from:", API_ENDPOINTS.shippers);
 
-        // Call external API to get shippers list
+        // Call external API with auth and x-role headers
         const response = await fetch(API_ENDPOINTS.shippers, {
             method: "GET",
-            headers: getAuthHeaders(token),
+            headers: getProxyHeaders(request),
         });
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error("Shippers API Error:", response.status, errorText);
-            return NextResponse.json(
-                { error: "1", message: errorText || "Không thể lấy danh sách shipper" },
-                { status: response.status }
-            );
-        }
-
+        // Return full response from original API
         const data = await response.json();
-        console.log("Shippers fetched successfully");
-
-        return NextResponse.json({
-            error: "0",
-            message: "Thành công",
-            data: data.data || data,
-        });
+        console.log("Shippers fetched, status:", response.status);
+        return NextResponse.json(data, { status: response.status });
     } catch (error) {
         console.error("Shippers API error:", error);
         return NextResponse.json(
