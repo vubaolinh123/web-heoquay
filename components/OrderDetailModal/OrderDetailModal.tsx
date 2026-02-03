@@ -96,6 +96,13 @@ export default function OrderDetailModal({
     const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
     const [paymentError, setPaymentError] = useState<string | null>(null);
 
+    // Ahamove delivery state
+    const [ahamoveServiceId, setAhamoveServiceId] = useState<"BIKE" | "ECO">("ECO");
+    const [ahamoveRemarks, setAhamoveRemarks] = useState("Có baga");
+    const [isCreatingAhamove, setIsCreatingAhamove] = useState(false);
+    const [ahamoveResult, setAhamoveResult] = useState<string | null>(null);
+    const [ahamoveError, setAhamoveError] = useState<string | null>(null);
+
     // Check if can edit post-roast products (only for Chi nhánh 1 and NOT shipper)
     const canEditPostRoast = useMemo(() => {
         // Shipper cannot edit post-roast products
@@ -407,6 +414,34 @@ export default function OrderDetailModal({
         }
     };
 
+    // Handle create Ahamove delivery
+    const handleCreateAhamove = async () => {
+        if (isCreatingAhamove) return;
+
+        setIsCreatingAhamove(true);
+        setAhamoveError(null);
+        setAhamoveResult(null);
+
+        try {
+            const data = await ordersApi.createAhamoveDelivery(
+                donHang.maDon,
+                ahamoveServiceId,
+                ahamoveRemarks
+            );
+
+            if (data.error === "0" || !data.error) {
+                setAhamoveResult("✓ Đã tạo đơn Ahamove thành công!");
+                setTimeout(() => setAhamoveResult(null), 5000);
+            } else {
+                setAhamoveError(data.message || "Không thể tạo đơn Ahamove");
+            }
+        } catch (error) {
+            setAhamoveError(error instanceof Error ? error.message : "Lỗi khi tạo đơn Ahamove");
+        } finally {
+            setIsCreatingAhamove(false);
+        }
+    };
+
     return (
         <div className={styles.overlay} onClick={onClose}>
             <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
@@ -542,6 +577,51 @@ export default function OrderDetailModal({
                             {zaloError && <div className={styles.errorMessage}>{zaloError}</div>}
                             {paymentError && <div className={styles.errorMessage}>{paymentError}</div>}
                             {paymentStatus && <div className={styles.successMessage}>{paymentStatus}</div>}
+                        </div>
+                    </div>
+
+                    {/* Ahamove Delivery Section */}
+                    <div className={styles.section}>
+                        <div className={styles.sectionTitle}>🛵 Giao hàng Ahamove</div>
+                        <div className={styles.sectionContent}>
+                            <div className={styles.ahamoveForm}>
+                                <div className={styles.ahamoveRow}>
+                                    <label className={styles.ahamoveLabel}>Loại giao hàng:</label>
+                                    <select
+                                        className={styles.ahamoveSelect}
+                                        value={ahamoveServiceId}
+                                        onChange={(e) => setAhamoveServiceId(e.target.value as "BIKE" | "ECO")}
+                                        disabled={isCreatingAhamove}
+                                    >
+                                        <option value="ECO">ECO (Tiết kiệm)</option>
+                                        <option value="BIKE">BIKE (Nhanh)</option>
+                                    </select>
+                                </div>
+                                <div className={styles.ahamoveRow}>
+                                    <label className={styles.ahamoveLabel}>Ghi chú cho tài xế:</label>
+                                    <input
+                                        type="text"
+                                        className={styles.ahamoveInput}
+                                        value={ahamoveRemarks}
+                                        onChange={(e) => setAhamoveRemarks(e.target.value)}
+                                        placeholder="Có baga"
+                                        disabled={isCreatingAhamove}
+                                    />
+                                </div>
+                                <button
+                                    className={`${styles.actionBtn} ${styles.ahamoveBtn}`}
+                                    onClick={handleCreateAhamove}
+                                    disabled={isCreatingAhamove}
+                                >
+                                    {isCreatingAhamove ? (
+                                        <Loader2 size={16} className={styles.loadingSpinner} />
+                                    ) : (
+                                        <>🛵 Tạo đơn Ahamove</>
+                                    )}
+                                </button>
+                            </div>
+                            {ahamoveError && <div className={styles.errorMessage}>{ahamoveError}</div>}
+                            {ahamoveResult && <div className={styles.successMessage}>{ahamoveResult}</div>}
                         </div>
                     </div>
 

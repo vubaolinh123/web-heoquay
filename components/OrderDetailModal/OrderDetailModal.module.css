@@ -1019,3 +1019,55 @@
   border-radius: 4px;
   font-weight: 600;
 }
+
+/* Ahamove Delivery Styles */
+.ahamoveForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ahamoveRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ahamoveLabel {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.ahamoveSelect,
+.ahamoveInput {
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  background: white;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.ahamoveSelect:focus,
+.ahamoveInput:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.ahamoveSelect:disabled,
+.ahamoveInput:disabled {
+  background: #f3f4f6;
+  cursor: not-allowed;
+}
+
+.ahamoveBtn {
+  background: linear-gradient(135deg, #f97316, #ea580c) !important;
+  color: white !important;
+  margin-top: 8px;
+}
+
+.ahamoveBtn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #ea580c, #c2410c) !important;
+}

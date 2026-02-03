@@ -139,6 +139,40 @@ export const ordersApi = {
     },
 
     /**
+     * Create Ahamove delivery order
+     * @param orderId - Order ID
+     * @param serviceId - Service type: "BIKE" | "ECO"
+     * @param remarks - Notes for driver
+     * @param tip - Tip amount (optional, default 5000)
+     */
+    createAhamoveDelivery: async (
+        orderId: string,
+        serviceId: "BIKE" | "ECO",
+        remarks: string,
+        tip: number = 5000
+    ): Promise<{ error?: string; message?: string }> => {
+        try {
+            const response = await fetch("/api/orders/ahamove", {
+                method: "POST",
+                headers: getHeaders(),
+                body: JSON.stringify({
+                    orderId,
+                    service_id: serviceId,
+                    remarks,
+                    Tip: tip,
+                }),
+            });
+
+            const data = await response.json();
+            console.log("Ahamove result:", data);
+            return data;
+        } catch (error) {
+            console.error("Ahamove error:", error);
+            throw error;
+        }
+    },
+
+    /**
      * Get QR code for order payment (returns base64 image)
      * @param orderId - Order ID (e.g., "WEB-3175680")
      * @returns Promise<string> - Base64 image string
