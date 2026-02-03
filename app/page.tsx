@@ -9,7 +9,7 @@ import OrderDetailModal from "@/components/OrderDetailModal";
 import StickyDayHeader from "@/components/StickyDayHeader";
 import { KitchenSlipModal, ReportModal } from "@/components/Print";
 import Toast from "@/components/Toast";
-import { ordersApi, transformApiOrder, groupOrdersByDate } from "@/lib/api";
+import { ordersApi, transformApiOrder, groupOrdersByDate, shippersApi, Shipper } from "@/lib/api";
 import { useAutoRefresh } from "@/hooks";
 import { formatTien } from "@/lib/mockData";
 import { DonHang, DonHangTheoNgay } from "@/lib/types";
@@ -32,10 +32,12 @@ export default function HomePage() {
   const [showToast, setShowToast] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Date and Branch filter state - initialize from URL query
+  // Date, Branch and Shipper filter state - initialize from URL query
   const [selectedDate, setSelectedDate] = useState(() => searchParams.get("date") || "");
   const [selectedBranch, setSelectedBranch] = useState("");
   const [selectedDeliveryMethod, setSelectedDeliveryMethod] = useState("");
+  const [selectedShipper, setSelectedShipper] = useState("");
+  const [shippers, setShippers] = useState<Shipper[]>([]);
 
   // Sync selectedDate when URL changes
   useEffect(() => {
@@ -168,6 +170,13 @@ export default function HomePage() {
         );
       }
 
+      // Apply shipper filter
+      if (selectedShipper) {
+        filteredOrders = filteredOrders.filter(
+          (d) => d.shipperNhanDon === selectedShipper
+        );
+      }
+
       return {
         ...day,
         donHangs: filteredOrders,
@@ -175,7 +184,7 @@ export default function HomePage() {
         tongDoanhThu: filteredOrders.reduce((sum, d) => sum + d.tongTien, 0),
       };
     }).filter((day) => day.donHangs.length > 0);
-  }, [allOrdersGroupedByDay, activeFilter, searchQuery, selectedDate, selectedBranch, selectedDeliveryMethod]);
+  }, [allOrdersGroupedByDay, activeFilter, searchQuery, selectedDate, selectedBranch, selectedDeliveryMethod, selectedShipper]);
 
   // Calculate order counts for tabs - based on FILTERED data (by branch/date/delivery, but not status)
   const orderCounts = useMemo(() => {
@@ -200,15 +209,23 @@ export default function HomePage() {
       preFilteredOrders = preFilteredOrders.filter((d) => d.hinhThucGiao === selectedDeliveryMethod);
     }
 
+    // Apply shipper filter
+    if (selectedShipper) {
+      preFilteredOrders = preFilteredOrders.filter((d) => d.shipperNhanDon === selectedShipper);
+    }
+
     return {
       all: preFilteredOrders.length,
       pending: preFilteredOrders.filter((d) => d.trangThai === "Chưa giao").length,
       roasting: preFilteredOrders.filter((d) => d.trangThai === "Đang quay").length,
       inProgress: preFilteredOrders.filter((d) => d.trangThai === "Đang giao").length,
       delivered: preFilteredOrders.filter((d) => d.trangThai === "Đã giao").length,
+      transferred: preFilteredOrders.filter((d) => d.trangThai === "Đã chuyển khoản").length,
       cancelled: preFilteredOrders.filter((d) => d.trangThai === "Đã hủy").length,
+      debt: preFilteredOrders.filter((d) => d.trangThai === "Công nợ").length,
+      completed: preFilteredOrders.filter((d) => d.trangThai === "Hoàn thành").length,
     };
-  }, [allOrdersGroupedByDay, selectedDate, selectedBranch, selectedDeliveryMethod]);
+  }, [allOrdersGroupedByDay, selectedDate, selectedBranch, selectedDeliveryMethod, selectedShipper]);
 
   // Generate dynamic date options from API data
   const dateOptions = useMemo<FilterOption[]>(() => {
@@ -277,6 +294,28 @@ export default function HomePage() {
 
     return options;
   }, [allOrdersGroupedByDay]);
+
+  // Generate shipper options from cached API data
+  const shipperOptions = useMemo<FilterOption[]>(() => {
+    const options: FilterOption[] = [{ value: "", label: "Shipper" }];
+    shippers.forEach((shipper) => {
+      options.push({ value: shipper.userName, label: shipper.userName });
+    });
+    return options;
+  }, [shippers]);
+
+  // Fetch shippers (with caching - only fetched once per page load)
+  useEffect(() => {
+    const fetchShippers = async () => {
+      try {
+        const shipperList = await shippersApi.getShippers();
+        setShippers(shipperList);
+      } catch (err) {
+        console.error("Failed to fetch shippers:", err);
+      }
+    };
+    fetchShippers();
+  }, []);
 
   // Setup IntersectionObserver for sticky header
   const setDaySectionRef = useCallback((dateKey: string, element: HTMLDivElement | null) => {
@@ -389,11 +428,12 @@ export default function HomePage() {
     setPrintModalData(null);
   };
 
-  // Clear date, branch and delivery method filters
+  // Clear date, branch, shipper and delivery method filters
   const handleClearFilters = useCallback(() => {
     setSelectedDate("");
     setSelectedBranch("");
     setSelectedDeliveryMethod("");
+    setSelectedShipper("");
   }, []);
 
   // Loading state
@@ -404,7 +444,7 @@ export default function HomePage() {
         onFilterChange={setActiveFilter}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        orderCounts={{ all: 0, pending: 0, roasting: 0, inProgress: 0, delivered: 0, cancelled: 0 }}
+        orderCounts={{ all: 0, pending: 0, roasting: 0, inProgress: 0, delivered: 0, transferred: 0, cancelled: 0, debt: 0, completed: 0 }}
       >
         <div className={styles.loadingState}>
           <div className={styles.spinner}></div>
@@ -422,7 +462,7 @@ export default function HomePage() {
         onFilterChange={setActiveFilter}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
-        orderCounts={{ all: 0, pending: 0, roasting: 0, inProgress: 0, delivered: 0, cancelled: 0 }}
+        orderCounts={{ all: 0, pending: 0, roasting: 0, inProgress: 0, delivered: 0, transferred: 0, cancelled: 0, debt: 0, completed: 0 }}
       >
         <div className={styles.errorState}>
           <p className={styles.errorMessage}>⚠️ {error}</p>
@@ -450,6 +490,9 @@ export default function HomePage() {
       deliveryMethodOptions={deliveryMethodOptions}
       selectedDeliveryMethod={selectedDeliveryMethod}
       onDeliveryMethodChange={setSelectedDeliveryMethod}
+      selectedShipper={selectedShipper}
+      onShipperChange={setSelectedShipper}
+      shipperOptions={shipperOptions}
       onClearFilters={handleClearFilters}
       onRefresh={handleManualRefresh}
       refreshCountdown={countdown}

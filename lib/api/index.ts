@@ -11,6 +11,7 @@ export * from "./types";
 export * from "./ordersApi";
 export * from "./warehouseApi";
 export * from "./collectOrdersApi";
+export * from "./shippersApi";
 
 // Data Transformation
 export * from "./transformOrders";

@@ -22,9 +22,11 @@ const STATUS_CONFIG: Record<TrangThaiDon, { label: string; className: string }> 
     "Đã giao": { label: "ĐÃ GIAO", className: "statusDelivered" },
     "Đã chuyển khoản": { label: "ĐÃ CHUYỂN KHOẢN", className: "statusTransferred" },
     "Đã hủy": { label: "ĐÃ HỦY", className: "statusCancelled" },
+    "Công nợ": { label: "CÔNG NỢ", className: "statusDebt" },
+    "Hoàn thành": { label: "HOÀN THÀNH", className: "statusCompleted" },
 };
 
-const STATUS_OPTIONS: TrangThaiDon[] = ["Chưa giao", "Đang quay", "Đang giao", "Đã giao", "Đã chuyển khoản", "Đã hủy"];
+const STATUS_OPTIONS: TrangThaiDon[] = ["Chưa giao", "Đang quay", "Đang giao", "Đã giao", "Đã chuyển khoản", "Công nợ", "Hoàn thành", "Đã hủy"];
 
 export default function OrderCard({ donHang, onClick, onStatusUpdate }: OrderCardProps) {
     const { isShipper } = useAuth();

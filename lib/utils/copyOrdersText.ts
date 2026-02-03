@@ -1,4 +1,5 @@
 import { DonHang } from "@/lib/types";
+import { CollectOrderRawItem } from "@/lib/api/collectOrdersApi";
 import { formatTien } from "@/lib/mockData";
 
 /**
@@ -240,6 +241,132 @@ export function generateOrdersSummaryText(
             //         text += `      - ${note}\n`;
             //     }
             // }
+        }
+    }
+
+    // Closing message
+    text += `\n━━━━━━━━━━━━━━━━━━━━━━\n`;
+    const totalHeo = heoProducts.reduce((sum, item) => sum + item.quantity, 0);
+    text += `💬 Dạ, tổng cộng ngày mai bếp ${branchText} cần chuẩn bị ${totalHeo} con heo các loại. Nếu anh chị cần thống kê thêm các món khác, em sẽ hỗ trợ ngay ạ!`;
+
+    return text;
+}
+
+/**
+ * Check if a raw item is a "heo" (pig) product based on name or product code
+ */
+function isHeoRawItem(item: CollectOrderRawItem): boolean {
+    const nameLower = item.tenHang.toLowerCase();
+    const codeLower = item.maHang.toLowerCase();
+
+    // Check if name contains "heo"
+    if (nameLower.includes("heo")) {
+        return true;
+    }
+
+    // Check product codes that indicate "heo"
+    // #NC (Nguyên Con), #H (Heo), #S (Heo Sữa)
+    if (codeLower.startsWith("nc") ||
+        codeLower.startsWith("h") ||
+        codeLower === "s") {
+        return true;
+    }
+
+    // Check if name contains "nguyên con"
+    if (nameLower.includes("nguyên con")) {
+        return true;
+    }
+
+    return false;
+}
+
+/**
+ * Generate formatted summary text from raw collect order items
+ * This function uses the exact raw items from collectOrdersApi to ensure accuracy
+ * @param rawItems - Raw items from collectOrdersApi.getRawItems()
+ * @param dateStr - Date string in DD-MM-YYYY format
+ * @param branch - Branch name (optional)
+ */
+export function generateCollectOrdersSummaryText(
+    rawItems: CollectOrderRawItem[],
+    dateStr: string,
+    branch?: string
+): string {
+    // Filter items for the specific date and branch
+    let filteredItems = rawItems.filter(item => item.ngayGiaoHang === dateStr);
+
+    if (branch) {
+        filteredItems = filteredItems.filter(item => item.chiNhanh === branch);
+    }
+
+    if (filteredItems.length === 0) {
+        return "Không có đơn hàng nào trong ngày này.";
+    }
+
+    const displayDate = formatDisplayDate(dateStr);
+    // Extract branch number/name properly
+    const branchName = branch
+        ? branch.replace(/chi nhánh\s*/i, "").trim()
+        : "";
+    const branchText = branchName ? `Chi Nhánh ${branchName}` : "bếp";
+
+    // Group items by product and separate heo vs side products
+    const heoMap = new Map<string, { name: string; quantity: number }>();
+    const sideMap = new Map<string, { name: string; quantity: number }>();
+
+    for (const item of filteredItems) {
+        // Skip shipping fees
+        if (item.tenHang.toLowerCase().includes("phí ship") ||
+            item.tenHang.toLowerCase().includes("phi ship")) {
+            continue;
+        }
+
+        const isHeo = isHeoRawItem(item);
+        const targetMap = isHeo ? heoMap : sideMap;
+
+        // Extract product name without code suffix
+        const productName = item.tenHang.split(" #")[0].trim();
+        const key = productName.toLowerCase();
+
+        if (targetMap.has(key)) {
+            targetMap.get(key)!.quantity += item.soLuong;
+        } else {
+            targetMap.set(key, {
+                name: productName,
+                quantity: item.soLuong,
+            });
+        }
+    }
+
+    const heoProducts = Array.from(heoMap.values());
+    const sideProducts = Array.from(sideMap.values());
+
+    // Build opening message with icon
+    let text = `📋 THỐNG KÊ ĐƠN HÀNG CHO BẾP\n`;
+    text += `━━━━━━━━━━━━━━━━━━━━━━\n`;
+    text += `📍 ${branchText} | 📅 ${displayDate}\n\n`;
+
+    // Heo products section
+    if (heoProducts.length > 0) {
+        text += `🐷 SẢN PHẨM HEO:\n`;
+        const heoQuantities: number[] = [];
+        for (const item of heoProducts) {
+            text += `   • ${item.name}: ${item.quantity} con\n`;
+            heoQuantities.push(item.quantity);
+        }
+
+        // Calculate total for heo
+        const heoTotal = heoQuantities.reduce((sum, q) => sum + q, 0);
+        const heoCalculationStr = heoQuantities.join(" + ");
+
+        text += `\n✅ Tổng cộng: ${heoCalculationStr} = ${heoTotal} con\n`;
+    }
+
+    // Side products section (phụ phẩm)
+    if (sideProducts.length > 0) {
+        text += `\n🥢 PHỤ PHẨM:\n`;
+        for (const item of sideProducts) {
+            text += `   • ${item.name}: ${item.quantity} phần\n`;
         }
     }
 

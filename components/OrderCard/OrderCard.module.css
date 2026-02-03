@@ -85,6 +85,16 @@
   color: #9333ea;
 }
 
+.statusDebt {
+  background-color: #fef0db;
+  color: #b45309;
+}
+
+.statusCompleted {
+  background-color: #ccfbf1;
+  color: #0d9488;
+}
+
 /* Delivery method styles */
 .statusDelivery {
   background-color: #dbeafe;
@@ -490,6 +500,16 @@
 .statusOption.statusRoasting {
   background: #ffedd5;
   color: #ea580c;
+}
+
+.statusOption.statusDebt {
+  background: #fef0db;
+  color: #b45309;
+}
+
+.statusOption.statusCompleted {
+  background: #ccfbf1;
+  color: #0d9488;
 }
 
 .statusOptionActive {

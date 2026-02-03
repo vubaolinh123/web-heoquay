@@ -16,7 +16,7 @@ export interface KhachHang {
     diaChi: string;        // Address
 }
 
-export type TrangThaiDon = "Chưa giao" | "Đang quay" | "Đang giao" | "Đã giao" | "Đã chuyển khoản" | "Đã hủy";
+export type TrangThaiDon = "Chưa giao" | "Đang quay" | "Đang giao" | "Đã giao" | "Đã chuyển khoản" | "Đã hủy" | "Công nợ" | "Hoàn thành";
 
 export interface DonHang {
     id: string;

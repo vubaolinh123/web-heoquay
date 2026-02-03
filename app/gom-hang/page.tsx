@@ -5,35 +5,26 @@ import { Package, RefreshCw, AlertCircle, Building2 } from "lucide-react";
 import MobileLayout, { FilterOption } from "@/components/MobileLayout";
 import { DateCard } from "@/components/GomHang";
 import Toast from "@/components/Toast";
-import { collectOrdersApi, CollectOrderRawItem, groupCollectOrdersByDate, ordersApi, transformApiOrder } from "@/lib/api";
-import { DonHang } from "@/lib/types";
+import { collectOrdersApi, CollectOrderRawItem, groupCollectOrdersByDate } from "@/lib/api";
 import { useAutoRefresh } from "@/hooks";
 import styles from "./page.module.css";
 
 export default function GomHangPage() {
     // Store raw items from API
     const [rawItems, setRawItems] = useState<CollectOrderRawItem[]>([]);
-    // Store full orders for copy feature
-    const [allOrders, setAllOrders] = useState<DonHang[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [showToast, setShowToast] = useState(false);
     const [selectedBranch, setSelectedBranch] = useState<string>("");
 
-    // Fetch raw items and full orders from API
+    // Fetch raw items from API
     const fetchData = useCallback(async () => {
         try {
             setIsLoading(true);
             setError(null);
 
-            // Fetch both collect orders and full orders in parallel
-            const [items, apiOrders] = await Promise.all([
-                collectOrdersApi.getRawItems(),
-                ordersApi.getOrders(),
-            ]);
-
+            const items = await collectOrdersApi.getRawItems();
             setRawItems(items);
-            setAllOrders(apiOrders.map(transformApiOrder));
         } catch (err) {
             console.error("Failed to fetch collect orders:", err);
             setError(err instanceof Error ? err.message : "Có lỗi xảy ra khi tải dữ liệu");
@@ -45,12 +36,8 @@ export default function GomHangPage() {
     // Silent refresh (no loading state)
     const silentRefresh = useCallback(async () => {
         try {
-            const [items, apiOrders] = await Promise.all([
-                collectOrdersApi.getRawItems(),
-                ordersApi.getOrders(),
-            ]);
+            const items = await collectOrdersApi.getRawItems();
             setRawItems(items);
-            setAllOrders(apiOrders.map(transformApiOrder));
         } catch (err) {
             console.error("Silent refresh failed:", err);
         }
@@ -100,25 +87,6 @@ export default function GomHangPage() {
         return groupCollectOrdersByDate(rawItems, selectedBranch || undefined);
     }, [rawItems, selectedBranch]);
 
-    // Helper: Get orders for a specific date (for copy feature)
-    const getOrdersForDate = useCallback((dateStr: string): DonHang[] => {
-        // dateStr is in DD-MM-YYYY format
-        const [day, month, year] = dateStr.split("-").map(Number);
-
-        return allOrders.filter(order => {
-            const orderDate = order.ngay;
-            const matches = orderDate.getDate() === day &&
-                orderDate.getMonth() + 1 === month &&
-                orderDate.getFullYear() === year;
-
-            // Also filter by branch if selected
-            if (selectedBranch && order.chiNhanh !== selectedBranch) {
-                return false;
-            }
-
-            return matches;
-        });
-    }, [allOrders, selectedBranch]);
 
     // Calculate total stats
     const totalDays = groupedData.length;
@@ -226,7 +194,7 @@ export default function GomHangPage() {
                                 key={`${day.ngayGiaoHang}-${index}`}
                                 data={day}
                                 branch={selectedBranch || undefined}
-                                ordersForDate={getOrdersForDate(day.ngayGiaoHang)}
+                                rawItems={rawItems}
                             />
                         ))}
                     </div>

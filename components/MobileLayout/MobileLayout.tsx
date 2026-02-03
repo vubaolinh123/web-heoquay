@@ -21,7 +21,7 @@ import {
 import { useAuth } from "@/contexts";
 import styles from "./MobileLayout.module.css";
 
-export type FilterStatus = "all" | "Chưa giao" | "Đang quay" | "Đang giao" | "Đã giao" | "Đã hủy";
+export type FilterStatus = "all" | "Chưa giao" | "Đang quay" | "Đang giao" | "Đã giao" | "Đã chuyển khoản" | "Đã hủy" | "Công nợ" | "Hoàn thành";
 
 export interface FilterOption {
     value: string;
@@ -40,7 +40,10 @@ interface MobileLayoutProps {
         roasting: number;
         inProgress: number;
         delivered: number;
+        transferred: number;
         cancelled: number;
+        debt: number;
+        completed: number;
     };
     selectedDate?: string;
     onDateChange?: (date: string) => void;
@@ -52,8 +55,11 @@ interface MobileLayoutProps {
     dateOptions?: FilterOption[];
     branchOptions?: FilterOption[];
     deliveryMethodOptions?: FilterOption[];
-    // Clear all dropdown filters
     onClearFilters?: () => void;
+    // Shipper filter
+    selectedShipper?: string;
+    onShipperChange?: (shipper: string) => void;
+    shipperOptions?: FilterOption[];
     // Refresh callback for page-specific refresh
     onRefresh?: () => Promise<void> | void;
     // Countdown seconds until next auto-refresh
@@ -73,6 +79,9 @@ const filterTabs: { id: FilterStatus; label: string }[] = [
     { id: "Đang quay", label: "Đang quay" },
     { id: "Đang giao", label: "Đang giao" },
     { id: "Đã giao", label: "Đã giao" },
+    { id: "Đã chuyển khoản", label: "Đã CK" },
+    { id: "Công nợ", label: "Công nợ" },
+    { id: "Hoàn thành", label: "Hoàn thành" },
     { id: "Đã hủy", label: "Đã hủy" },
 ];
 
@@ -89,13 +98,17 @@ const defaultDeliveryMethodOptions: FilterOption[] = [
     { value: "", label: "Hình thức giao" },
 ];
 
+const defaultShipperOptions: FilterOption[] = [
+    { value: "", label: "Shipper" },
+];
+
 export default function MobileLayout({
     children,
     activeFilter = "all",
     onFilterChange,
     searchQuery = "",
     onSearchChange,
-    orderCounts = { all: 0, pending: 0, roasting: 0, inProgress: 0, delivered: 0, cancelled: 0 },
+    orderCounts = { all: 0, pending: 0, roasting: 0, inProgress: 0, delivered: 0, transferred: 0, cancelled: 0, debt: 0, completed: 0 },
     selectedDate = "",
     onDateChange,
     selectedBranch = "",
@@ -106,6 +119,9 @@ export default function MobileLayout({
     selectedDeliveryMethod = "",
     onDeliveryMethodChange,
     onClearFilters,
+    selectedShipper = "",
+    onShipperChange,
+    shipperOptions = defaultShipperOptions,
     onRefresh,
     refreshCountdown,
 }: MobileLayoutProps) {
@@ -152,7 +168,10 @@ export default function MobileLayout({
             case "Đang quay": return orderCounts.roasting;
             case "Đang giao": return orderCounts.inProgress;
             case "Đã giao": return orderCounts.delivered;
+            case "Đã chuyển khoản": return orderCounts.transferred;
             case "Đã hủy": return orderCounts.cancelled;
+            case "Công nợ": return orderCounts.debt;
+            case "Hoàn thành": return orderCounts.completed;
             default: return 0;
         }
     };
@@ -338,6 +357,21 @@ export default function MobileLayout({
 
                             <div className={styles.dropdown}>
                                 <select
+                                    className={`${styles.dropdownSelect} ${selectedShipper ? styles.dropdownActive : ""}`}
+                                    value={selectedShipper}
+                                    onChange={(e) => onShipperChange?.(e.target.value)}
+                                >
+                                    {shipperOptions.map((opt) => (
+                                        <option key={opt.value} value={opt.value}>
+                                            {opt.label}
+                                        </option>
+                                    ))}
+                                </select>
+                                <ChevronDown size={16} className={styles.dropdownIcon} />
+                            </div>
+
+                            <div className={styles.dropdown}>
+                                <select
                                     className={`${styles.dropdownSelect} ${selectedDeliveryMethod ? styles.dropdownActive : ""}`}
                                     value={selectedDeliveryMethod}
                                     onChange={(e) => onDeliveryMethodChange?.(e.target.value)}
@@ -352,7 +386,7 @@ export default function MobileLayout({
                             </div>
 
                             {/* Clear Filters Button - only show when filters active */}
-                            {(selectedDate || selectedBranch || selectedDeliveryMethod) && (
+                            {(selectedDate || selectedBranch || selectedShipper || selectedDeliveryMethod) && (
                                 <button
                                     className={styles.clearFiltersButton}
                                     onClick={onClearFilters}

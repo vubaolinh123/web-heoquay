@@ -1,17 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { CollectOrderDay } from "@/lib/api/collectOrdersApi";
-import { DonHang } from "@/lib/types";
+import { CollectOrderDay, CollectOrderRawItem } from "@/lib/api/collectOrdersApi";
 import { Calendar, CalendarDays, Package, Building2, Copy, Check } from "lucide-react";
-import { generateOrdersSummaryText, copyToClipboard } from "@/lib/utils";
+import { generateCollectOrdersSummaryText, copyToClipboard } from "@/lib/utils";
 import ItemRow from "../ItemRow";
 import styles from "./DateCard.module.css";
 
 interface DateCardProps {
     data: CollectOrderDay;
     branch?: string;
-    ordersForDate?: DonHang[];  // Full order details for copy feature
+    rawItems?: CollectOrderRawItem[];  // Raw items for accurate copy feature
 }
 
 /**
@@ -35,7 +34,7 @@ function getTotalItems(items: CollectOrderDay["danhSachHang"]): number {
     return items.reduce((sum, item) => sum + item.tongSoLuong, 0);
 }
 
-export default function DateCard({ data, branch, ordersForDate }: DateCardProps) {
+export default function DateCard({ data, branch, rawItems }: DateCardProps) {
     const { day, monthYear } = formatDate(data.ngayGiaoHang);
     const totalItems = getTotalItems(data.danhSachHang);
     const totalProducts = data.danhSachHang.length;
@@ -46,10 +45,10 @@ export default function DateCard({ data, branch, ordersForDate }: DateCardProps)
 
     const handleCopyClick = async (e: React.MouseEvent) => {
         e.stopPropagation();
-        if (!ordersForDate || ordersForDate.length === 0 || isCopying) return;
+        if (!rawItems || rawItems.length === 0 || isCopying) return;
 
         setIsCopying(true);
-        const text = generateOrdersSummaryText(ordersForDate, data.ngayGiaoHang, displayBranch);
+        const text = generateCollectOrdersSummaryText(rawItems, data.ngayGiaoHang, displayBranch);
         const success = await copyToClipboard(text);
 
         if (success) {
@@ -90,7 +89,7 @@ export default function DateCard({ data, branch, ordersForDate }: DateCardProps)
                 </div>
                 <div className={styles.statsRight}>
                     {/* Copy Button */}
-                    {ordersForDate && ordersForDate.length > 0 && (
+                    {rawItems && rawItems.length > 0 && (
                         <button
                             className={`${styles.copyBtn} ${isCopied ? styles.copyBtnSuccess : ""}`}
                             onClick={handleCopyClick}
