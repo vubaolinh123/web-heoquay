@@ -16,8 +16,30 @@ export async function GET(request: Request) {
             headers: getProxyHeaders(request),
         });
 
-        // Return full response from original API
-        const data = await response.json();
+        // Handle non-JSON response (HTML error page, etc.)
+        const contentType = response.headers.get("content-type");
+        const responseText = await response.text();
+
+        if (!contentType?.includes("application/json")) {
+            console.error("Orders API returned non-JSON:", responseText.substring(0, 200));
+            return NextResponse.json(
+                { error: "1", message: "API server error - invalid response" },
+                { status: 502 }
+            );
+        }
+
+        // Parse JSON response
+        let data;
+        try {
+            data = JSON.parse(responseText);
+        } catch {
+            console.error("Failed to parse JSON:", responseText.substring(0, 200));
+            return NextResponse.json(
+                { error: "1", message: "Invalid JSON response from API" },
+                { status: 502 }
+            );
+        }
+
         console.log("Orders fetched, status:", response.status);
         return NextResponse.json(data, { status: response.status });
     } catch (error) {
