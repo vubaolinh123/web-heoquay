@@ -113,15 +113,16 @@ export const ordersApi = {
      * Uses Next.js API route as proxy to avoid CORS issues
      * @param orderId - Order ID (e.g., "WEB-SHDKADHS")
      * @param phoneNumber - Customer phone number
+     * @param type - Message type: 1 = Gửi xác nhận, 2 = Gửi mã thanh toán
      * @returns Promise<boolean> - True if successful
      * @throws Error if API returns error or network fails
      */
-    sendZaloToCustomer: async (orderId: string, phoneNumber: string): Promise<boolean> => {
+    sendZaloToCustomer: async (orderId: string, phoneNumber: string, type: 1 | 2 = 1): Promise<boolean> => {
         try {
             const response = await fetch("/api/orders/send-zalo", {
                 method: "POST",
                 headers: getHeaders(),
-                body: JSON.stringify({ orderId, phone_number: phoneNumber }),
+                body: JSON.stringify({ orderId, phone_number: phoneNumber, type }),
             });
 
             const data = await response.json();

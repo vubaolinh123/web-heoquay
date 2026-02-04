@@ -56,8 +56,8 @@ export default function OrderDetailModal({
     const [isAddingProduct, setIsAddingProduct] = useState(false);
     const [newProduct, setNewProduct] = useState({
         name: "Thành phần sau quay",
-        quantity: 1,
-        price: 0,
+        quantity: "1",
+        price: "0",
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [productError, setProductError] = useState<string | null>(null);
@@ -66,6 +66,7 @@ export default function OrderDetailModal({
     const [isSendingZalo, setIsSendingZalo] = useState(false);
     const [zaloSuccess, setZaloSuccess] = useState(false);
     const [zaloError, setZaloError] = useState<string | null>(null);
+    const [zaloType, setZaloType] = useState<1 | 2>(1); // 1: Gửi xác nhận, 2: Gửi mã thanh toán
 
     // Shipper confirm state
     const [isConfirmingOrder, setIsConfirmingOrder] = useState(false);
@@ -99,6 +100,7 @@ export default function OrderDetailModal({
     // Ahamove delivery state
     const [ahamoveServiceId, setAhamoveServiceId] = useState<"BIKE" | "ECO">("ECO");
     const [ahamoveRemarks, setAhamoveRemarks] = useState("Có baga");
+    const [ahamoveTip, setAhamoveTip] = useState(0);
     const [isCreatingAhamove, setIsCreatingAhamove] = useState(false);
     const [ahamoveResult, setAhamoveResult] = useState<string | null>(null);
     const [ahamoveError, setAhamoveError] = useState<string | null>(null);
@@ -241,7 +243,10 @@ export default function OrderDetailModal({
 
     // Add new product
     const handleAddProduct = async () => {
-        if (!newProduct.name || newProduct.quantity <= 0) {
+        const qty = parseInt(newProduct.quantity) || 0;
+        const prc = parseInt(newProduct.price) || 0;
+
+        if (!newProduct.name || qty <= 0) {
             setProductError("Tên và số lượng là bắt buộc");
             return;
         }
@@ -253,13 +258,13 @@ export default function OrderDetailModal({
             await ordersApi.updateOrderItems(donHang.maDon, [{
                 code: "#TP",
                 name: newProduct.name,
-                quantity: newProduct.quantity,
-                price: newProduct.price,
+                quantity: qty,
+                price: prc,
             }]);
 
             if (onOrderUpdate) await onOrderUpdate();
             setIsAddingProduct(false);
-            setNewProduct({ name: "Thành phần sau quay", quantity: 1, price: 0 });
+            setNewProduct({ name: "Thành phần sau quay", quantity: "1", price: "0" });
         } catch (error) {
             setProductError(error instanceof Error ? error.message : "Không thể thêm sản phẩm");
         } finally {
@@ -270,11 +275,11 @@ export default function OrderDetailModal({
     // Cancel adding product
     const cancelAddProduct = () => {
         setIsAddingProduct(false);
-        setNewProduct({ name: "Thành phần sau quay", quantity: 1, price: 0 });
+        setNewProduct({ name: "Thành phần sau quay", quantity: "1", price: "0" });
         setProductError(null);
     };
 
-    // Handle send Zalo
+    // Handle send Zalo with type
     const handleSendZalo = async () => {
         if (isSendingZalo || !donHang.khachHang.soDienThoai) return;
 
@@ -283,7 +288,7 @@ export default function OrderDetailModal({
         setZaloSuccess(false);
 
         try {
-            await ordersApi.sendZaloToCustomer(donHang.maDon, donHang.khachHang.soDienThoai);
+            await ordersApi.sendZaloToCustomer(donHang.maDon, donHang.khachHang.soDienThoai, zaloType);
             setZaloSuccess(true);
             // Reset success message after 3 seconds
             setTimeout(() => setZaloSuccess(false), 3000);
@@ -292,6 +297,16 @@ export default function OrderDetailModal({
         } finally {
             setIsSendingZalo(false);
         }
+    };
+
+    // Handle tip change for Ahamove
+    const handleTipChange = (delta: number) => {
+        setAhamoveTip(prev => {
+            const newTip = prev + delta;
+            if (newTip < 0) return 0;
+            if (newTip > 30000) return 30000;
+            return newTip;
+        });
     };
 
     // Handle shipper confirm order (for Shipper self-confirm)
@@ -426,7 +441,8 @@ export default function OrderDetailModal({
             const data = await ordersApi.createAhamoveDelivery(
                 donHang.maDon,
                 ahamoveServiceId,
-                ahamoveRemarks
+                ahamoveRemarks,
+                ahamoveTip
             );
 
             if (data.error === "0" || !data.error) {
@@ -608,6 +624,30 @@ export default function OrderDetailModal({
                                         disabled={isCreatingAhamove}
                                     />
                                 </div>
+                                <div className={styles.ahamoveRow}>
+                                    <label className={styles.ahamoveLabel}>Tiền tip:</label>
+                                    <div className={styles.tipInputWrapper}>
+                                        <button
+                                            type="button"
+                                            className={styles.tipBtn}
+                                            onClick={() => handleTipChange(-5000)}
+                                            disabled={isCreatingAhamove || ahamoveTip <= 0}
+                                        >
+                                            −
+                                        </button>
+                                        <span className={styles.tipValue}>
+                                            {ahamoveTip.toLocaleString("vi-VN")}đ
+                                        </span>
+                                        <button
+                                            type="button"
+                                            className={styles.tipBtn}
+                                            onClick={() => handleTipChange(5000)}
+                                            disabled={isCreatingAhamove || ahamoveTip >= 30000}
+                                        >
+                                            +
+                                        </button>
+                                    </div>
+                                </div>
                                 <button
                                     className={`${styles.actionBtn} ${styles.ahamoveBtn}`}
                                     onClick={handleCreateAhamove}
@@ -650,20 +690,31 @@ export default function OrderDetailModal({
                                     <span className={styles.infoValue}>{donHang.khachHang.diaChi}</span>
                                 </div>
 
-                                {/* Send Zalo Button */}
+                                {/* Send Zalo Button with Type Select */}
                                 <div className={styles.zaloButtonWrapper}>
-                                    <button
-                                        className={`${styles.sendZaloBtn} ${zaloSuccess ? styles.sendZaloSuccess : ""}`}
-                                        onClick={handleSendZalo}
-                                        disabled={isSendingZalo || !donHang.khachHang.soDienThoai}
-                                    >
-                                        {isSendingZalo ? (
-                                            <Loader2 size={18} className={styles.spin} />
-                                        ) : (
-                                            <MessageCircle size={18} />
-                                        )}
-                                        <span>{zaloSuccess ? "Đã gửi Zalo!" : "Gửi Zalo"}</span>
-                                    </button>
+                                    <div className={styles.zaloSelectRow}>
+                                        <select
+                                            className={styles.zaloTypeSelect}
+                                            value={zaloType}
+                                            onChange={(e) => setZaloType(Number(e.target.value) as 1 | 2)}
+                                            disabled={isSendingZalo}
+                                        >
+                                            <option value={1}>Gửi xác nhận</option>
+                                            <option value={2}>Gửi mã thanh toán</option>
+                                        </select>
+                                        <button
+                                            className={`${styles.sendZaloBtn} ${zaloSuccess ? styles.sendZaloSuccess : ""}`}
+                                            onClick={handleSendZalo}
+                                            disabled={isSendingZalo || !donHang.khachHang.soDienThoai}
+                                        >
+                                            {isSendingZalo ? (
+                                                <Loader2 size={18} className={styles.spin} />
+                                            ) : (
+                                                <MessageCircle size={18} />
+                                            )}
+                                            <span>{zaloSuccess ? "Đã gửi!" : "Gửi Zalo"}</span>
+                                        </button>
+                                    </div>
                                     {zaloError && (
                                         <div className={styles.zaloError}>{zaloError}</div>
                                     )}
@@ -864,7 +915,7 @@ export default function OrderDetailModal({
                                                 type="number"
                                                 placeholder="SL"
                                                 value={newProduct.quantity}
-                                                onChange={(e) => setNewProduct({ ...newProduct, quantity: Number(e.target.value) })}
+                                                onChange={(e) => setNewProduct({ ...newProduct, quantity: e.target.value })}
                                                 className={styles.addProductQty}
                                                 min={1}
                                             />
@@ -872,7 +923,7 @@ export default function OrderDetailModal({
                                                 type="number"
                                                 placeholder="Giá"
                                                 value={newProduct.price}
-                                                onChange={(e) => setNewProduct({ ...newProduct, price: Number(e.target.value) })}
+                                                onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
                                                 className={styles.addProductPrice}
                                                 min={0}
                                             />

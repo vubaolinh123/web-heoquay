@@ -1071,3 +1071,108 @@
 .ahamoveBtn:hover:not(:disabled) {
   background: linear-gradient(135deg, #ea580c, #c2410c) !important;
 }
+
+/* Tip Input Styles */
+.tipInputWrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tipBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: white;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #374151;
+  transition: all 0.2s;
+}
+
+.tipBtn:hover:not(:disabled) {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.tipBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.tipValue {
+  min-width: 100px;
+  text-align: center;
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: #f97316;
+  padding: 8px 16px;
+  background: #fff7ed;
+  border-radius: 8px;
+  border: 1px solid #fed7aa;
+}
+
+/* Zalo Type Select Styles */
+.zaloSelectRow {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.zaloTypeSelect {
+  flex: 0 0 40%;
+  min-width: 140px;
+  padding: 12px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  background: white;
+  color: #374151;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.zaloTypeSelect:focus {
+  outline: none;
+  border-color: #0068ff;
+  box-shadow: 0 0 0 3px rgba(0, 104, 255, 0.1);
+}
+
+.zaloTypeSelect:disabled {
+  background: #f3f4f6;
+  cursor: not-allowed;
+}
+
+/* Update sendZaloBtn for row layout */
+.zaloSelectRow .sendZaloBtn {
+  flex: 1;
+  padding: 12px 20px;
+  white-space: nowrap;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .zaloSelectRow {
+    flex-direction: column;
+  }
+
+  .zaloSelectRow .sendZaloBtn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .tipInputWrapper {
+    justify-content: flex-start;
+  }
+
+  .tipValue {
+    min-width: 80px;
+    flex: 1;
+  }
+}

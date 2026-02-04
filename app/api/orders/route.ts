@@ -10,10 +10,14 @@ export async function GET(request: Request) {
     try {
         console.log("Fetching orders from:", API_ENDPOINTS.orders);
 
+        // Debug: Log request headers
+        const headers = getProxyHeaders(request);
+        console.log("Request headers being sent:", JSON.stringify(headers, null, 2));
+
         // Forward request to external API with auth and x-role headers
         const response = await fetch(API_ENDPOINTS.orders, {
             method: "GET",
-            headers: getProxyHeaders(request),
+            headers: headers,
         });
 
         // Handle non-JSON response (HTML error page, etc.)
@@ -21,7 +25,10 @@ export async function GET(request: Request) {
         const responseText = await response.text();
 
         if (!contentType?.includes("application/json")) {
-            console.error("Orders API returned non-JSON:", responseText.substring(0, 200));
+            // Log more details about Cloudflare response
+            console.error("Orders API returned non-JSON. Status:", response.status);
+            console.error("Response headers:", JSON.stringify(Object.fromEntries(response.headers.entries()), null, 2));
+            console.error("Response body (first 500 chars):", responseText.substring(0, 500));
             return NextResponse.json(
                 { error: "1", message: "API server error - invalid response" },
                 { status: 502 }
