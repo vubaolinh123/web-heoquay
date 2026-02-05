@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Phone, MapPin, Building2, ChevronDown, Loader2, Check } from "lucide-react";
+import { Phone, MapPin, Building2, ChevronDown, Loader2, Check, MessageCircle } from "lucide-react";
 import { DonHang, TrangThaiDon } from "@/lib/types";
 import { formatTien } from "@/lib/mockData";
 import { ordersApi } from "@/lib/api";
@@ -34,6 +34,10 @@ export default function OrderCard({ donHang, onClick, onStatusUpdate }: OrderCar
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isUpdating, setIsUpdating] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+
+    // Zalo sending state
+    const [isSendingZalo, setIsSendingZalo] = useState(false);
+    const [zaloSuccess, setZaloSuccess] = useState(false);
 
     // Filter status options - Bep role cannot see "Hoàn thành" and "Công nợ"
     const filteredStatusOptions = user?.role === "Bep"
@@ -102,6 +106,25 @@ export default function OrderCard({ donHang, onClick, onStatusUpdate }: OrderCar
         }
     };
 
+    // Handle send Zalo to ship group (type = 4)
+    const handleSendZaloShip = async (e: React.MouseEvent) => {
+        e.stopPropagation(); // Prevent card click
+        if (isSendingZalo || !donHang.khachHang.soDienThoai) return;
+
+        setIsSendingZalo(true);
+        setZaloSuccess(false);
+
+        try {
+            await ordersApi.sendZaloToCustomer(donHang.maDon, donHang.khachHang.soDienThoai, 4);
+            setZaloSuccess(true);
+            setTimeout(() => setZaloSuccess(false), 3000);
+        } catch (error) {
+            console.error("Failed to send Zalo:", error);
+        } finally {
+            setIsSendingZalo(false);
+        }
+    };
+
     return (
         <div className={styles.orderCard} onClick={onClick}>
             {/* Left Section - Time + Customer Info */}
@@ -139,8 +162,8 @@ export default function OrderCard({ donHang, onClick, onStatusUpdate }: OrderCar
                     {/* Payment Status */}
                     {donHang.trangThaiThanhToan && (
                         <span className={`${styles.quickBadge} ${donHang.trangThaiThanhToan === "Đã thanh toán"
-                                ? styles.badgePaid
-                                : styles.badgeUnpaid
+                            ? styles.badgePaid
+                            : styles.badgeUnpaid
                             }`}>
                             {donHang.trangThaiThanhToan === "Đã thanh toán" ? "✓ Đã TT" : "Chưa TT"}
                         </span>
@@ -197,6 +220,7 @@ export default function OrderCard({ donHang, onClick, onStatusUpdate }: OrderCar
             {/* Right Section - Price + Status */}
             <div className={styles.priceRow}>
                 <span className={styles.totalPrice}>{formatTien(donHang.tongTien)}</span>
+
 
                 {/* Status Dropdown */}
                 <div className={styles.statusDropdownContainer} ref={dropdownRef}>

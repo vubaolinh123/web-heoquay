@@ -557,3 +557,34 @@
 .statusOption:not(:last-child) {
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
+
+/* Zalo Ship Button */
+.zaloShipBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  background: linear-gradient(135deg, #0068ff, #0059db);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.zaloShipBtn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0059db, #004fc4);
+  transform: scale(1.02);
+}
+
+.zaloShipBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.zaloShipSuccess {
+  background: linear-gradient(135deg, #16a34a, #14532d) !important;
+}

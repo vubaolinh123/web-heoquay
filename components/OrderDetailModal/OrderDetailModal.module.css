@@ -1117,6 +1117,78 @@
   border: 1px solid #fed7aa;
 }
 
+/* Fragile Option Styles */
+.fragileRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: #fff5f5;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 2px solid transparent;
+  margin-top: 8px;
+}
+
+.fragileRow:hover {
+  background: #fef2f2;
+}
+
+.fragileActive {
+  border-color: #f97316;
+  background: #fff7ed;
+}
+
+.fragileInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fragileLabel {
+  font-weight: 600;
+  color: #1f2937;
+  font-size: var(--font-size-base);
+}
+
+.fragileIcon {
+  color: #9ca3af;
+  cursor: help;
+  font-size: 16px;
+}
+
+.fragileRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.fragilePrice {
+  font-weight: 600;
+  color: #374151;
+  font-size: var(--font-size-base);
+}
+
+.fragileCheck {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #d1d5db;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  background: white;
+}
+
+.fragileChecked {
+  background: #f97316;
+  border-color: #f97316;
+  color: white;
+  font-weight: 700;
+}
+
 /* Zalo Type Select Styles */
 .zaloSelectRow {
   display: flex;

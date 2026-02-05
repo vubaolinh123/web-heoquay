@@ -32,6 +32,11 @@ export default function HomePage() {
   const [showToast, setShowToast] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Zalo sending state for DailyHeader
+  const [sendingZaloDate, setSendingZaloDate] = useState<string | null>(null);
+  const [zaloSuccessDate, setZaloSuccessDate] = useState<string | null>(null);
+  const [zaloToastMessage, setZaloToastMessage] = useState<string | null>(null);
+
   // Date, Branch and Shipper filter state - initialize from URL query
   const [selectedDate, setSelectedDate] = useState(() => searchParams.get("date") || "");
   const [selectedBranch, setSelectedBranch] = useState("");
@@ -424,6 +429,34 @@ export default function HomePage() {
     });
   };
 
+  const handleSendZaloDaily = async (day: DonHangTheoNgay) => {
+    const dateKey = day.ngay.toISOString().split("T")[0];
+    if (sendingZaloDate) return; // Already sending
+
+    // Get first order with phone number
+    const orderWithPhone = day.donHangs.find(d => d.khachHang.soDienThoai);
+    if (!orderWithPhone) return;
+
+    setSendingZaloDate(dateKey);
+    setZaloSuccessDate(null);
+
+    try {
+      await ordersApi.sendZaloToCustomer(orderWithPhone.maDon, orderWithPhone.khachHang.soDienThoai, 4);
+      setZaloSuccessDate(dateKey);
+      setZaloToastMessage("Đã gửi tin nhắn Zalo thành công!");
+      setTimeout(() => {
+        setZaloSuccessDate(null);
+        setZaloToastMessage(null);
+      }, 3000);
+    } catch (error) {
+      console.error("Failed to send Zalo:", error);
+      setZaloToastMessage("Gửi Zalo thất bại!");
+      setTimeout(() => setZaloToastMessage(null), 3000);
+    } finally {
+      setSendingZaloDate(null);
+    }
+  };
+
   const closePrintModal = () => {
     setPrintModalData(null);
   };
@@ -545,6 +578,9 @@ export default function HomePage() {
                   tongDoanhThu={day.tongDoanhThu}
                   onPrint={() => handlePrintDaily(day)}
                   onExport={() => handleExportDaily(day)}
+                  onSendZalo={() => handleSendZaloDaily(day)}
+                  isSendingZalo={sendingZaloDate === dateKey}
+                  zaloSuccess={zaloSuccessDate === dateKey}
                 />
                 <div className={styles.orders}>
                   {day.donHangs.map((donHang) => (
@@ -598,6 +634,15 @@ export default function HomePage() {
         isVisible={showToast}
         onClose={() => setShowToast(false)}
       />
+
+      {/* Toast notification for Zalo */}
+      {zaloToastMessage && (
+        <Toast
+          message={zaloToastMessage}
+          isVisible={!!zaloToastMessage}
+          onClose={() => setZaloToastMessage(null)}
+        />
+      )}
     </MobileLayout>
   );
 }

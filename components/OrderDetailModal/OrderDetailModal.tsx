@@ -103,6 +103,7 @@ export default function OrderDetailModal({
     const [ahamoveServiceId, setAhamoveServiceId] = useState<"BIKE" | "ECO">("ECO");
     const [ahamoveRemarks, setAhamoveRemarks] = useState("Có baga");
     const [ahamoveTip, setAhamoveTip] = useState(0);
+    const [ahamoveFragile, setAhamoveFragile] = useState(false);
     const [isCreatingAhamove, setIsCreatingAhamove] = useState(false);
     const [ahamoveResult, setAhamoveResult] = useState<string | null>(null);
     const [ahamoveError, setAhamoveError] = useState<string | null>(null);
@@ -449,7 +450,8 @@ export default function OrderDetailModal({
                 donHang.maDon,
                 ahamoveServiceId,
                 ahamoveRemarks,
-                ahamoveTip
+                ahamoveTip,
+                ahamoveFragile ? 1 : 0
             );
 
             if (data.error === "0" || !data.error) {
@@ -653,6 +655,22 @@ export default function OrderDetailModal({
                                         >
                                             +
                                         </button>
+                                    </div>
+                                </div>
+                                {/* Fragile option row */}
+                                <div
+                                    className={`${styles.fragileRow} ${ahamoveFragile ? styles.fragileActive : ''}`}
+                                    onClick={() => setAhamoveFragile(!ahamoveFragile)}
+                                >
+                                    <div className={styles.fragileInfo}>
+                                        <span className={styles.fragileLabel}>Giao hàng dễ vỡ</span>
+                                        <span className={styles.fragileIcon} title="Phụ phí cho hàng dễ vỡ">ⓘ</span>
+                                    </div>
+                                    <div className={styles.fragileRight}>
+                                        <span className={styles.fragilePrice}>10.000đ</span>
+                                        <div className={`${styles.fragileCheck} ${ahamoveFragile ? styles.fragileChecked : ''}`}>
+                                            {ahamoveFragile && <span>✓</span>}
+                                        </div>
                                     </div>
                                 </div>
                                 <button

@@ -136,6 +136,31 @@
   background-color: rgba(255, 255, 255, 0.35);
 }
 
+/* Zalo Button - Blue color */
+.zaloButton {
+  background: linear-gradient(135deg, #0068ff, #0059db);
+  border-color: rgba(0, 104, 255, 0.5);
+  width: auto;
+  padding: 0 12px;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.zaloButton:hover {
+  background: linear-gradient(135deg, #0059db, #004fc4);
+}
+
+.zaloButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.zaloSuccess {
+  background: linear-gradient(135deg, #16a34a, #14532d);
+  border-color: rgba(22, 163, 74, 0.5);
+}
+
 /* Tablet and Desktop - single row */
 @media (min-width: 768px) {
   .dailyHeader {

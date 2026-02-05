@@ -1,4 +1,4 @@
-import { Calendar, Printer, FileText } from "lucide-react";
+import { Calendar, Printer, FileText, MessageCircle } from "lucide-react";
 import { formatTien } from "@/lib/mockData";
 import styles from "./DailyHeader.module.css";
 
@@ -10,6 +10,9 @@ interface DailyHeaderProps {
     tongDoanhThu: number;
     onPrint?: () => void;
     onExport?: () => void;
+    onSendZalo?: () => void;
+    isSendingZalo?: boolean;
+    zaloSuccess?: boolean;
 }
 
 export default function DailyHeader({
@@ -20,6 +23,9 @@ export default function DailyHeader({
     tongDoanhThu,
     onPrint,
     onExport,
+    onSendZalo,
+    isSendingZalo = false,
+    zaloSuccess = false,
 }: DailyHeaderProps) {
     const formattedDate = ngay.toLocaleDateString("vi-VN", {
         day: "2-digit",
@@ -45,6 +51,16 @@ export default function DailyHeader({
                 <span className={styles.totalRevenue}>{formatTien(tongDoanhThu)}</span>
 
                 <div className={styles.actionButtons}>
+                    <button
+                        type="button"
+                        className={`${styles.actionButton} ${styles.zaloButton} ${zaloSuccess ? styles.zaloSuccess : ''}`}
+                        onClick={(e) => { e.stopPropagation(); onSendZalo?.(); }}
+                        aria-label="Gửi nhóm ship"
+                        disabled={isSendingZalo}
+                    >
+                        <MessageCircle size={18} />
+                        <span>Gửi nhóm ship</span>
+                    </button>
                     <button
                         type="button"
                         className={styles.actionButton}

@@ -113,11 +113,11 @@ export const ordersApi = {
      * Uses Next.js API route as proxy to avoid CORS issues
      * @param orderId - Order ID (e.g., "WEB-SHDKADHS")
      * @param phoneNumber - Customer phone number
-     * @param type - Message type: 1 = Gửi xác nhận, 2 = Gửi mã thanh toán, 3 = Gửi nhóm ship
+     * @param type - Message type: 1 = Gửi xác nhận, 2 = Gửi mã thanh toán, 3 = Gửi nhóm ship (modal), 4 = Gửi nhóm ship (card)
      * @returns Promise<boolean> - True if successful
      * @throws Error if API returns error or network fails
      */
-    sendZaloToCustomer: async (orderId: string, phoneNumber: string, type: 1 | 2 | 3 = 1): Promise<boolean> => {
+    sendZaloToCustomer: async (orderId: string, phoneNumber: string, type: 1 | 2 | 3 | 4 = 1): Promise<boolean> => {
         try {
             const response = await fetch("/api/orders/send-zalo", {
                 method: "POST",
@@ -145,12 +145,14 @@ export const ordersApi = {
      * @param serviceId - Service type: "BIKE" | "ECO"
      * @param remarks - Notes for driver
      * @param tip - Tip amount (optional, default 5000)
+     * @param fragile - Fragile item flag (0 or 1, default 0)
      */
     createAhamoveDelivery: async (
         orderId: string,
         serviceId: "BIKE" | "ECO",
         remarks: string,
-        tip: number = 5000
+        tip: number = 5000,
+        fragile: 0 | 1 = 0
     ): Promise<{ error?: string; message?: string }> => {
         try {
             const response = await fetch("/api/orders/ahamove", {
@@ -161,6 +163,7 @@ export const ordersApi = {
                     service_id: serviceId,
                     remarks,
                     Tip: tip,
+                    fragile,
                 }),
             });
 
