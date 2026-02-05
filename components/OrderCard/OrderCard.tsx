@@ -29,11 +29,16 @@ const STATUS_CONFIG: Record<TrangThaiDon, { label: string; className: string }> 
 const STATUS_OPTIONS: TrangThaiDon[] = ["Chưa giao", "Đang quay", "Đang giao", "Đã giao", "Đã chuyển khoản", "Công nợ", "Hoàn thành", "Đã hủy"];
 
 export default function OrderCard({ donHang, onClick, onStatusUpdate }: OrderCardProps) {
-    const { isShipper } = useAuth();
+    const { isShipper, user } = useAuth();
     const [currentStatus, setCurrentStatus] = useState<TrangThaiDon>(donHang.trangThai);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isUpdating, setIsUpdating] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+
+    // Filter status options - Bep role cannot see "Hoàn thành" and "Công nợ"
+    const filteredStatusOptions = user?.role === "Bep"
+        ? STATUS_OPTIONS.filter(s => s !== "Hoàn thành" && s !== "Công nợ")
+        : STATUS_OPTIONS;
 
     // Close dropdown when clicking outside
     useEffect(() => {
@@ -129,6 +134,31 @@ export default function OrderCard({ donHang, onClick, onStatusUpdate }: OrderCar
                     </div>
                 )}
 
+                {/* Quick Info Badges - Payment, Shipper, Deposit */}
+                <div className={styles.quickInfoRow}>
+                    {/* Payment Status */}
+                    {donHang.trangThaiThanhToan && (
+                        <span className={`${styles.quickBadge} ${donHang.trangThaiThanhToan === "Đã thanh toán"
+                                ? styles.badgePaid
+                                : styles.badgeUnpaid
+                            }`}>
+                            {donHang.trangThaiThanhToan === "Đã thanh toán" ? "✓ Đã TT" : "Chưa TT"}
+                        </span>
+                    )}
+                    {/* Shipper */}
+                    {donHang.shipperNhanDon && (
+                        <span className={`${styles.quickBadge} ${styles.badgeShipper}`}>
+                            🛵 {donHang.shipperNhanDon}
+                        </span>
+                    )}
+                    {/* Deposit Amount */}
+                    {donHang.tienDatCoc && donHang.tienDatCoc > 0 && (
+                        <span className={`${styles.quickBadge} ${styles.badgeDeposit}`}>
+                            💰 Cọc: {formatTien(donHang.tienDatCoc)}
+                        </span>
+                    )}
+                </div>
+
                 {/* Address Row */}
                 <div className={styles.addressRow}>
                     <MapPin size={14} className={styles.addressIcon} />
@@ -187,7 +217,7 @@ export default function OrderCard({ donHang, onClick, onStatusUpdate }: OrderCar
 
                     {isDropdownOpen && (
                         <div className={styles.statusDropdown}>
-                            {STATUS_OPTIONS.map((status) => {
+                            {filteredStatusOptions.map((status) => {
                                 const config = STATUS_CONFIG[status];
                                 const isActive = status === currentStatus;
                                 return (

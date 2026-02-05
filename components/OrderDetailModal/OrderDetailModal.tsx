@@ -18,13 +18,15 @@ interface OrderDetailModalProps {
     onOrderUpdate?: () => Promise<void>; // Callback to refresh order data
 }
 
-// Status options
+// Status options - full list, will be filtered by role
 const STATUS_OPTIONS: { value: TrangThaiDon; label: string; color: string }[] = [
     { value: "Chưa giao", label: "Chưa giao", color: "#d97706" },
     { value: "Đang quay", label: "Đang quay", color: "#ea580c" },
     { value: "Đang giao", label: "Đang giao", color: "#2563eb" },
     { value: "Đã giao", label: "Đã giao", color: "#16a34a" },
     { value: "Đã chuyển khoản", label: "Đã chuyển khoản", color: "#9333ea" },
+    { value: "Công nợ", label: "Công nợ", color: "#ef4444" },
+    { value: "Hoàn thành", label: "Hoàn thành", color: "#10b981" },
     { value: "Đã hủy", label: "Đã hủy", color: "#dc2626" },
 ];
 
@@ -66,7 +68,7 @@ export default function OrderDetailModal({
     const [isSendingZalo, setIsSendingZalo] = useState(false);
     const [zaloSuccess, setZaloSuccess] = useState(false);
     const [zaloError, setZaloError] = useState<string | null>(null);
-    const [zaloType, setZaloType] = useState<1 | 2>(1); // 1: Gửi xác nhận, 2: Gửi mã thanh toán
+    const [zaloType, setZaloType] = useState<1 | 2 | 3>(1); // 1: Gửi xác nhận, 2: Gửi mã thanh toán, 3: Gửi nhóm ship
 
     // Shipper confirm state
     const [isConfirmingOrder, setIsConfirmingOrder] = useState(false);
@@ -104,6 +106,11 @@ export default function OrderDetailModal({
     const [isCreatingAhamove, setIsCreatingAhamove] = useState(false);
     const [ahamoveResult, setAhamoveResult] = useState<string | null>(null);
     const [ahamoveError, setAhamoveError] = useState<string | null>(null);
+
+    // Filter status options - Bep role cannot see "Hoàn thành" and "Công nợ"
+    const filteredStatusOptions = user?.role === "Bep"
+        ? STATUS_OPTIONS.filter(s => s.value !== "Hoàn thành" && s.value !== "Công nợ")
+        : STATUS_OPTIONS;
 
     // Check if can edit post-roast products (only for Chi nhánh 1 and NOT shipper)
     const canEditPostRoast = useMemo(() => {

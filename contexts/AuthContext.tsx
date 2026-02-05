@@ -13,7 +13,7 @@ import {
 // Types
 // ===========================================
 
-export type UserRole = "Admin" | "Shipper";
+export type UserRole = "Admin" | "Shipper" | "Bep";
 
 export interface User {
     userName: string;
@@ -86,7 +86,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
             if (data.error === "0" && data.data?.token) {
                 const newToken = data.data.token;
                 // Get role from API response, default to Shipper if not provided
-                const role: UserRole = data.data.role === "Admin" ? "Admin" : "Shipper";
+                const apiRole = data.data.role;
+                const role: UserRole = apiRole === "Admin" ? "Admin" : apiRole === "Bep" ? "Bep" : "Shipper";
                 const newUser: User = {
                     userName: data.data.userName || userName,
                     role
