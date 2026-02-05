@@ -22,8 +22,8 @@ export const API_ENDPOINTS = {
     orderCheckPaid: `${API_BASE_URL}/order-check-payed`,    // Check if order is paid
     shipperConfirm: `${API_BASE_URL}/shipper-confirm`,
     shippers: `${API_BASE_URL}/shippers`,
-    // Ahamove delivery
-    ahamoveDelivery: "/ahamove-drivery",
+    // Ahamove delivery - uses webhookt (not webhook)
+    ahamoveDelivery: "https://asia-82692522.phoaify.com/webhookt/api/v1/heoquay/ahamove-drivery",
     // Placeholder endpoints
     qrPayment: `${API_BASE_URL}/orders/qr-payment`,
     users: `${API_BASE_URL}/users`,

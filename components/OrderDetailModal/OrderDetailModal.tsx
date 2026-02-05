@@ -703,11 +703,12 @@ export default function OrderDetailModal({
                                         <select
                                             className={styles.zaloTypeSelect}
                                             value={zaloType}
-                                            onChange={(e) => setZaloType(Number(e.target.value) as 1 | 2)}
+                                            onChange={(e) => setZaloType(Number(e.target.value) as 1 | 2 | 3)}
                                             disabled={isSendingZalo}
                                         >
                                             <option value={1}>Gửi xác nhận</option>
                                             <option value={2}>Gửi mã thanh toán</option>
+                                            <option value={3}>Gửi nhóm ship</option>
                                         </select>
                                         <button
                                             className={`${styles.sendZaloBtn} ${zaloSuccess ? styles.sendZaloSuccess : ""}`}
