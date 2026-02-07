@@ -7,16 +7,19 @@ import DailyHeader from "@/components/DailyHeader";
 import OrderCard from "@/components/OrderCard";
 import OrderDetailModal from "@/components/OrderDetailModal";
 import StickyDayHeader from "@/components/StickyDayHeader";
+import BulkActionBar from "@/components/BulkActionBar";
 import { KitchenSlipModal, ReportModal } from "@/components/Print";
 import Toast from "@/components/Toast";
-import { ordersApi, transformApiOrder, groupOrdersByDate, shippersApi, Shipper } from "@/lib/api";
+import { ordersApi, transformApiOrder, groupOrdersByDate, shippersApi, Shipper, bulkUpdateType } from "@/lib/api";
 import { useAutoRefresh } from "@/hooks";
+import { useAuth } from "@/contexts/AuthContext";
 import { formatTien } from "@/lib/mockData";
-import { DonHang, DonHangTheoNgay } from "@/lib/types";
+import { DonHang, DonHangTheoNgay, TrangThaiDon } from "@/lib/types";
 import styles from "./page.module.css";
 
 export default function HomePage() {
   const searchParams = useSearchParams();
+  const { user } = useAuth();
 
   const [selectedOrder, setSelectedOrder] = useState<DonHang | null>(null);
   const [activeFilter, setActiveFilter] = useState<FilterStatus>("all");
@@ -62,6 +65,12 @@ export default function HomePage() {
 
   const daySectionRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const observerRef = useRef<IntersectionObserver | null>(null);
+
+  // Bulk selection state
+  const [selectedOrderIds, setSelectedOrderIds] = useState<Set<string>>(new Set());
+  const [isBulkLoading, setIsBulkLoading] = useState(false);
+  const [bulkToastMessage, setBulkToastMessage] = useState<string | null>(null);
+  const selectionMode = selectedOrderIds.size > 0;
 
   // Fetch orders from API
   const fetchOrders = useCallback(async () => {
@@ -469,6 +478,83 @@ export default function HomePage() {
     setSelectedShipper("");
   }, []);
 
+  // =============================================
+  // Bulk Selection Handlers
+  // =============================================
+
+  // Handle individual order selection
+  const handleOrderSelect = useCallback((orderId: string, selected: boolean) => {
+    setSelectedOrderIds(prev => {
+      const newSet = new Set(prev);
+      if (selected) {
+        newSet.add(orderId);
+      } else {
+        newSet.delete(orderId);
+      }
+      return newSet;
+    });
+  }, []);
+
+  // Handle select all for a day
+  const handleSelectAllDay = useCallback((day: DonHangTheoNgay) => {
+    const dayOrderIds = day.donHangs.map(o => o.maDon);
+    const allSelected = dayOrderIds.every(id => selectedOrderIds.has(id));
+
+    setSelectedOrderIds(prev => {
+      const newSet = new Set(prev);
+      if (allSelected) {
+        // Deselect all
+        dayOrderIds.forEach(id => newSet.delete(id));
+      } else {
+        // Select all
+        dayOrderIds.forEach(id => newSet.add(id));
+      }
+      return newSet;
+    });
+  }, [selectedOrderIds]);
+
+  // Get selected count for a specific day
+  const getSelectedCountForDay = useCallback((day: DonHangTheoNgay) => {
+    return day.donHangs.filter(o => selectedOrderIds.has(o.maDon)).length;
+  }, [selectedOrderIds]);
+
+  // Clear all selection
+  const handleClearSelection = useCallback(() => {
+    setSelectedOrderIds(new Set());
+  }, []);
+
+  // Handle bulk action
+  const handleBulkAction = useCallback(async (type: 1 | 2 | 3 | 4, status?: TrangThaiDon) => {
+    if (selectedOrderIds.size === 0) return;
+
+    setIsBulkLoading(true);
+    try {
+      const orderIds = Array.from(selectedOrderIds);
+      await bulkUpdateType(orderIds, type, status);
+
+      // Show success message
+      const actionNames: Record<number, string> = {
+        1: "Gửi nhóm Ship",
+        2: `Cập nhật trạng thái: ${status}`,
+        3: "Gửi xác nhận",
+        4: "Gửi mã thanh toán",
+      };
+      setBulkToastMessage(`✅ Đã ${actionNames[type]} cho ${orderIds.length} đơn`);
+
+      // Clear selection and refresh
+      setSelectedOrderIds(new Set());
+      await fetchOrders();
+
+      setTimeout(() => setBulkToastMessage(null), 3000);
+    } catch (error) {
+      console.error("Bulk action error:", error);
+      setBulkToastMessage("❌ Có lỗi xảy ra!");
+      setTimeout(() => setBulkToastMessage(null), 3000);
+    } finally {
+      setIsBulkLoading(false);
+    }
+  }, [selectedOrderIds, fetchOrders]);
+
   // Loading state
   if (isLoading) {
     return (
@@ -581,6 +667,9 @@ export default function HomePage() {
                   onSendZalo={() => handleSendZaloDaily(day)}
                   isSendingZalo={sendingZaloDate === dateKey}
                   zaloSuccess={zaloSuccessDate === dateKey}
+                  selectionMode={selectionMode}
+                  selectedCount={getSelectedCountForDay(day)}
+                  onSelectAll={() => handleSelectAllDay(day)}
                 />
                 <div className={styles.orders}>
                   {day.donHangs.map((donHang) => (
@@ -589,6 +678,7 @@ export default function HomePage() {
                       donHang={donHang}
                       onClick={() => setSelectedOrder(donHang)}
                       onStatusUpdate={() => handleOrderUpdate()}
+                      isSelected={selectedOrderIds.has(donHang.maDon)}
                     />
                   ))}
                 </div>
@@ -643,6 +733,24 @@ export default function HomePage() {
           onClose={() => setZaloToastMessage(null)}
         />
       )}
+
+      {/* Toast notification for Bulk Actions */}
+      {bulkToastMessage && (
+        <Toast
+          message={bulkToastMessage}
+          isVisible={!!bulkToastMessage}
+          onClose={() => setBulkToastMessage(null)}
+        />
+      )}
+
+      {/* Bulk Action Bar */}
+      <BulkActionBar
+        selectedCount={selectedOrderIds.size}
+        onAction={handleBulkAction}
+        onClearSelection={handleClearSelection}
+        isLoading={isBulkLoading}
+        userRole={user?.role || "Admin"}
+      />
     </MobileLayout>
   );
 }

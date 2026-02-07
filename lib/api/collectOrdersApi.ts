@@ -12,6 +12,7 @@ export interface CollectOrderRawItem {
     maHang: string;        // "H6"
     tenHang: string;       // "Heo Nguyên Con Size 5.5-6kg #H6"
     soLuong: number;       // 1
+    gioGiaoHang?: string;  // "10:00" (optional)
 }
 
 // Grouped item (sau khi group theo tên + mã hàng)

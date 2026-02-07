@@ -1,4 +1,5 @@
 .orderCard {
+  position: relative;
   background-color: var(--color-surface);
   border: 1px solid #e2e8f0;
   border-radius: var(--radius-md);
@@ -19,6 +20,47 @@
 
 .orderCard:active {
   background-color: #fafafa;
+}
+
+/* Selected state */
+.orderCardSelected {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.1);
+}
+
+.orderCardSelected:hover {
+  border-color: #f87171;
+}
+
+/* Checkbox */
+.checkbox {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  z-index: 2;
+  transition: all 0.15s;
+}
+
+.checkbox:hover {
+  background: #f1f5f9;
+}
+
+.checkboxUnchecked {
+  color: #94a3b8;
+}
+
+.checkboxChecked {
+  color: #dc2626;
 }
 
 /* === Row 1: Time + Order Code + Status === */

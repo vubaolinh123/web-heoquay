@@ -47,6 +47,37 @@
   flex-shrink: 0;
 }
 
+/* Select All Button */
+.selectAllBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.selectAllBtn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.checkboxUnchecked {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.checkboxChecked {
+  color: #86efac;
+}
+
+.checkboxPartial {
+  color: #fbbf24;
+}
+
 .dayOfWeek {
   font-weight: 700;
   font-size: var(--font-size-base);

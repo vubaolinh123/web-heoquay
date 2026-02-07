@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { CollectOrderDay, CollectOrderRawItem } from "@/lib/api/collectOrdersApi";
-import { Calendar, CalendarDays, Package, Building2, Copy, Check } from "lucide-react";
-import { generateCollectOrdersSummaryText, copyToClipboard } from "@/lib/utils";
+import { Calendar, CalendarDays, Package, Building2, Copy, Check, ChevronDown, Clock } from "lucide-react";
+import { generateCollectOrdersSummaryText, generateCollectOrdersSummaryByHour, copyToClipboard } from "@/lib/utils";
 import ItemRow from "../ItemRow";
 import styles from "./DateCard.module.css";
 
@@ -12,6 +12,8 @@ interface DateCardProps {
     branch?: string;
     rawItems?: CollectOrderRawItem[];  // Raw items for accurate copy feature
 }
+
+type CopyMode = "day" | "hour";
 
 /**
  * Format date string "27-01-2026" to display format
@@ -42,18 +44,43 @@ export default function DateCard({ data, branch, rawItems }: DateCardProps) {
 
     const [isCopied, setIsCopied] = useState(false);
     const [isCopying, setIsCopying] = useState(false);
+    const [showDropdown, setShowDropdown] = useState(false);
+    const [copiedMode, setCopiedMode] = useState<CopyMode | null>(null);
+    const dropdownRef = useRef<HTMLDivElement>(null);
 
-    const handleCopyClick = async (e: React.MouseEvent) => {
-        e.stopPropagation();
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setShowDropdown(false);
+            }
+        };
+
+        if (showDropdown) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [showDropdown]);
+
+    const handleCopyClick = async (mode: CopyMode) => {
         if (!rawItems || rawItems.length === 0 || isCopying) return;
 
         setIsCopying(true);
-        const text = generateCollectOrdersSummaryText(rawItems, data.ngayGiaoHang, displayBranch);
+        setShowDropdown(false);
+
+        const text = mode === "hour"
+            ? generateCollectOrdersSummaryByHour(rawItems, data.ngayGiaoHang, displayBranch)
+            : generateCollectOrdersSummaryText(rawItems, data.ngayGiaoHang, displayBranch);
+
         const success = await copyToClipboard(text);
 
         if (success) {
             setIsCopied(true);
-            setTimeout(() => setIsCopied(false), 2000);
+            setCopiedMode(mode);
+            setTimeout(() => {
+                setIsCopied(false);
+                setCopiedMode(null);
+            }, 2000);
         }
         setIsCopying(false);
     };
@@ -88,26 +115,59 @@ export default function DateCard({ data, branch, rawItems }: DateCardProps) {
                     <span>{totalProducts} sản phẩm</span>
                 </div>
                 <div className={styles.statsRight}>
-                    {/* Copy Button */}
+                    {/* Copy Dropdown */}
                     {rawItems && rawItems.length > 0 && (
-                        <button
-                            className={`${styles.copyBtn} ${isCopied ? styles.copyBtnSuccess : ""}`}
-                            onClick={handleCopyClick}
-                            disabled={isCopying}
-                            title="Sao chép tổng hợp đơn hàng"
-                        >
-                            {isCopied ? (
-                                <>
-                                    <Check size={14} />
-                                    <span>Đã copy!</span>
-                                </>
-                            ) : (
-                                <>
-                                    <Copy size={14} />
-                                    <span>Copy</span>
-                                </>
+                        <div className={styles.copyDropdown} ref={dropdownRef}>
+                            <button
+                                className={`${styles.copyBtn} ${isCopied ? styles.copyBtnSuccess : ""}`}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (!isCopied) {
+                                        setShowDropdown(!showDropdown);
+                                    }
+                                }}
+                                disabled={isCopying}
+                                title="Sao chép tổng hợp đơn hàng"
+                            >
+                                {isCopied ? (
+                                    <>
+                                        <Check size={14} />
+                                        <span>{copiedMode === "hour" ? "Theo giờ!" : "Theo ngày!"}</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Copy size={14} />
+                                        <span>Copy</span>
+                                        <ChevronDown size={12} className={showDropdown ? styles.chevronUp : ""} />
+                                    </>
+                                )}
+                            </button>
+
+                            {showDropdown && (
+                                <div className={styles.copyMenu}>
+                                    <button
+                                        className={styles.copyOption}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleCopyClick("day");
+                                        }}
+                                    >
+                                        <Calendar size={14} />
+                                        <span>Theo ngày</span>
+                                    </button>
+                                    <button
+                                        className={styles.copyOption}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleCopyClick("hour");
+                                        }}
+                                    >
+                                        <Clock size={14} />
+                                        <span>Theo giờ</span>
+                                    </button>
+                                </div>
                             )}
-                        </button>
+                        </div>
                     )}
                     <div className={styles.statTotal}>
                         <span>Tổng: {totalItems}</span>

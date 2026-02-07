@@ -1248,3 +1248,262 @@
     flex: 1;
   }
 }
+
+/* ===================== */
+/* Ahamove Redesigned Section */
+/* ===================== */
+
+.ahamoveForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.ahamoveAddressRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.ahamoveLabel {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+/* Options Grid - 2 columns */
+.ahamoveOptionsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-md);
+}
+
+.ahamoveOption {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.ahamoveOptionLabel {
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.ahamoveSelect {
+  padding: 12px 14px;
+  border: 2px solid #e2e8f0;
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  background: white;
+  color: #1e293b;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ahamoveSelect:focus {
+  outline: none;
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.ahamoveSelect:disabled {
+  background: #f8fafc;
+  cursor: not-allowed;
+}
+
+/* Tip input in grid */
+.ahamoveOption .tipInputWrapper {
+  display: flex;
+  align-items: center;
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: var(--radius-lg);
+  padding: 6px;
+  gap: 0;
+}
+
+.tipBtn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f5f9;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 18px;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.tipBtn:hover:not(:disabled) {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+.tipBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.tipValue {
+  flex: 1;
+  text-align: center;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* Notes Row */
+.ahamoveNotesRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.ahamoveTextarea {
+  padding: 12px 14px;
+  border: 2px solid #e2e8f0;
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-sm);
+  background: white;
+  color: #1e293b;
+  resize: vertical;
+  min-height: 60px;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.ahamoveTextarea:focus {
+  outline: none;
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.ahamoveTextarea::placeholder {
+  color: #94a3b8;
+}
+
+.ahamoveTextarea:disabled {
+  background: #f8fafc;
+  cursor: not-allowed;
+}
+
+/* Ahamove Button */
+.ahamoveBtn {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  color: white;
+  border: none;
+  padding: 14px 24px;
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.ahamoveBtn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
+}
+
+.ahamoveBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Fragile Row Improvements */
+.fragileRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.fragileRow:hover {
+  border-color: #cbd5e1;
+}
+
+.fragileActive {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.fragileInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fragileLabel {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: #1e293b;
+}
+
+.fragileIcon {
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.fragileRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.fragilePrice {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: #dc2626;
+}
+
+.fragileCheck {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #e2e8f0;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  transition: all 0.2s;
+}
+
+.fragileChecked {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: white;
+}
+
+/* Mobile Responsive */
+@media (max-width: 480px) {
+  .ahamoveOptionsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .ahamoveBtn {
+    padding: 12px 20px;
+    font-size: var(--font-size-sm);
+  }
+
+  .fragileRow {
+    padding: 12px 14px;
+  }
+}

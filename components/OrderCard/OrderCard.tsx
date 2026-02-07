@@ -12,6 +12,8 @@ interface OrderCardProps {
     donHang: DonHang;
     onClick?: () => void;
     onStatusUpdate?: (orderId: string, newStatus: TrangThaiDon) => void;
+    // Used when this order is selected via DailyHeader select all
+    isSelected?: boolean;
 }
 
 // Status configuration for colors and labels
@@ -28,7 +30,12 @@ const STATUS_CONFIG: Record<TrangThaiDon, { label: string; className: string }> 
 
 const STATUS_OPTIONS: TrangThaiDon[] = ["Chưa giao", "Đang quay", "Đang giao", "Đã giao", "Đã chuyển khoản", "Công nợ", "Hoàn thành", "Đã hủy"];
 
-export default function OrderCard({ donHang, onClick, onStatusUpdate }: OrderCardProps) {
+export default function OrderCard({
+    donHang,
+    onClick,
+    onStatusUpdate,
+    isSelected = false,
+}: OrderCardProps) {
     const { isShipper, user } = useAuth();
     const [currentStatus, setCurrentStatus] = useState<TrangThaiDon>(donHang.trangThai);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -39,9 +46,14 @@ export default function OrderCard({ donHang, onClick, onStatusUpdate }: OrderCar
     const [isSendingZalo, setIsSendingZalo] = useState(false);
     const [zaloSuccess, setZaloSuccess] = useState(false);
 
-    // Filter status options - Bep role cannot see "Hoàn thành" and "Công nợ"
+    // Filter status options - Bep role cannot see: Hoàn thành, Công nợ, Đã chuyển khoản, Đã hủy
     const filteredStatusOptions = user?.role === "Bep"
-        ? STATUS_OPTIONS.filter(s => s !== "Hoàn thành" && s !== "Công nợ")
+        ? STATUS_OPTIONS.filter(s =>
+            s !== "Hoàn thành" &&
+            s !== "Công nợ" &&
+            s !== "Đã chuyển khoản" &&
+            s !== "Đã hủy"
+        )
         : STATUS_OPTIONS;
 
     // Close dropdown when clicking outside
@@ -125,8 +137,17 @@ export default function OrderCard({ donHang, onClick, onStatusUpdate }: OrderCar
         }
     };
 
+    // Handle checkbox click
+    // Handle card click - always open detail
+    const handleCardClick = () => {
+        onClick?.();
+    };
+
     return (
-        <div className={styles.orderCard} onClick={onClick}>
+        <div
+            className={`${styles.orderCard} ${isSelected ? styles.orderCardSelected : ""}`}
+            onClick={handleCardClick}
+        >
             {/* Left Section - Time + Customer Info */}
             <div className={styles.leftSection}>
                 {/* Time Row */}

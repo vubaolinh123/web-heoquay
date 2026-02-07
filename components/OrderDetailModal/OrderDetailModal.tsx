@@ -7,6 +7,7 @@ import { formatTien } from "@/lib/mockData";
 import { ordersApi } from "@/lib/api";
 import { shippersApi, Shipper } from "@/lib/api/shippersApi";
 import { useAuth } from "@/contexts/AuthContext";
+import AddressSearchInput from "@/components/AddressSearchInput";
 import styles from "./OrderDetailModal.module.css";
 
 interface OrderDetailModalProps {
@@ -104,6 +105,7 @@ export default function OrderDetailModal({
     const [ahamoveRemarks, setAhamoveRemarks] = useState("Có baga");
     const [ahamoveTip, setAhamoveTip] = useState(0);
     const [ahamoveFragile, setAhamoveFragile] = useState(false);
+    const [ahamoveAddress, setAhamoveAddress] = useState(donHang.khachHang.diaChi || "");
     const [isCreatingAhamove, setIsCreatingAhamove] = useState(false);
     const [ahamoveResult, setAhamoveResult] = useState<string | null>(null);
     const [ahamoveError, setAhamoveError] = useState<string | null>(null);
@@ -605,78 +607,97 @@ export default function OrderDetailModal({
                         </div>
                     </div>
 
-                    {/* Ahamove Delivery Section */}
+                    {/* Ahamove Delivery Section - Redesigned */}
                     <div className={styles.section}>
                         <div className={styles.sectionTitle}>🛵 Giao hàng Ahamove</div>
                         <div className={styles.sectionContent}>
                             <div className={styles.ahamoveForm}>
-                                <div className={styles.ahamoveRow}>
-                                    <label className={styles.ahamoveLabel}>Loại giao hàng:</label>
-                                    <select
-                                        className={styles.ahamoveSelect}
-                                        value={ahamoveServiceId}
-                                        onChange={(e) => setAhamoveServiceId(e.target.value as "BIKE" | "ECO")}
-                                        disabled={isCreatingAhamove}
-                                    >
-                                        <option value="ECO">ECO (Tiết kiệm)</option>
-                                        <option value="BIKE">BIKE (Nhanh)</option>
-                                    </select>
-                                </div>
-                                <div className={styles.ahamoveRow}>
-                                    <label className={styles.ahamoveLabel}>Ghi chú cho tài xế:</label>
-                                    <input
-                                        type="text"
-                                        className={styles.ahamoveInput}
-                                        value={ahamoveRemarks}
-                                        onChange={(e) => setAhamoveRemarks(e.target.value)}
-                                        placeholder="Có baga"
+                                {/* Address Search */}
+                                <div className={styles.ahamoveAddressRow}>
+                                    <label className={styles.ahamoveLabel}>📍 Địa chỉ giao hàng:</label>
+                                    <AddressSearchInput
+                                        value={ahamoveAddress}
+                                        onChange={(address) => setAhamoveAddress(address)}
+                                        placeholder="Nhập địa chỉ giao hàng..."
                                         disabled={isCreatingAhamove}
                                     />
                                 </div>
-                                <div className={styles.ahamoveRow}>
-                                    <label className={styles.ahamoveLabel}>Tiền tip:</label>
-                                    <div className={styles.tipInputWrapper}>
-                                        <button
-                                            type="button"
-                                            className={styles.tipBtn}
-                                            onClick={() => handleTipChange(-5000)}
-                                            disabled={isCreatingAhamove || ahamoveTip <= 0}
+
+                                {/* Options Grid */}
+                                <div className={styles.ahamoveOptionsGrid}>
+                                    <div className={styles.ahamoveOption}>
+                                        <label className={styles.ahamoveOptionLabel}>Loại giao hàng</label>
+                                        <select
+                                            className={styles.ahamoveSelect}
+                                            value={ahamoveServiceId}
+                                            onChange={(e) => setAhamoveServiceId(e.target.value as "BIKE" | "ECO")}
+                                            disabled={isCreatingAhamove}
                                         >
-                                            −
-                                        </button>
-                                        <span className={styles.tipValue}>
-                                            {ahamoveTip.toLocaleString("vi-VN")}đ
-                                        </span>
-                                        <button
-                                            type="button"
-                                            className={styles.tipBtn}
-                                            onClick={() => handleTipChange(5000)}
-                                            disabled={isCreatingAhamove || ahamoveTip >= 30000}
-                                        >
-                                            +
-                                        </button>
+                                            <option value="ECO">🚴 ECO (Tiết kiệm)</option>
+                                            <option value="BIKE">🏍️ BIKE (Nhanh)</option>
+                                        </select>
+                                    </div>
+                                    <div className={styles.ahamoveOption}>
+                                        <label className={styles.ahamoveOptionLabel}>Tiền tip</label>
+                                        <div className={styles.tipInputWrapper}>
+                                            <button
+                                                type="button"
+                                                className={styles.tipBtn}
+                                                onClick={() => handleTipChange(-5000)}
+                                                disabled={isCreatingAhamove || ahamoveTip <= 0}
+                                            >
+                                                −
+                                            </button>
+                                            <span className={styles.tipValue}>
+                                                {ahamoveTip.toLocaleString("vi-VN")}đ
+                                            </span>
+                                            <button
+                                                type="button"
+                                                className={styles.tipBtn}
+                                                onClick={() => handleTipChange(5000)}
+                                                disabled={isCreatingAhamove || ahamoveTip >= 30000}
+                                            >
+                                                +
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                                {/* Fragile option row */}
+
+                                {/* Fragile option */}
                                 <div
                                     className={`${styles.fragileRow} ${ahamoveFragile ? styles.fragileActive : ''}`}
                                     onClick={() => setAhamoveFragile(!ahamoveFragile)}
                                 >
                                     <div className={styles.fragileInfo}>
-                                        <span className={styles.fragileLabel}>Giao hàng dễ vỡ</span>
+                                        <span className={styles.fragileLabel}>📦 Giao hàng dễ vỡ</span>
                                         <span className={styles.fragileIcon} title="Phụ phí cho hàng dễ vỡ">ⓘ</span>
                                     </div>
                                     <div className={styles.fragileRight}>
-                                        <span className={styles.fragilePrice}>10.000đ</span>
+                                        <span className={styles.fragilePrice}>+10.000đ</span>
                                         <div className={`${styles.fragileCheck} ${ahamoveFragile ? styles.fragileChecked : ''}`}>
                                             {ahamoveFragile && <span>✓</span>}
                                         </div>
                                     </div>
                                 </div>
+
+                                {/* Notes for driver */}
+                                <div className={styles.ahamoveNotesRow}>
+                                    <label className={styles.ahamoveLabel}>📝 Ghi chú cho tài xế:</label>
+                                    <textarea
+                                        className={styles.ahamoveTextarea}
+                                        value={ahamoveRemarks}
+                                        onChange={(e) => setAhamoveRemarks(e.target.value)}
+                                        placeholder="Có baga, gọi trước khi đến..."
+                                        disabled={isCreatingAhamove}
+                                        rows={2}
+                                    />
+                                </div>
+
+                                {/* Submit button */}
                                 <button
                                     className={`${styles.actionBtn} ${styles.ahamoveBtn}`}
                                     onClick={handleCreateAhamove}
-                                    disabled={isCreatingAhamove}
+                                    disabled={isCreatingAhamove || !ahamoveAddress.trim()}
                                 >
                                     {isCreatingAhamove ? (
                                         <Loader2 size={16} className={styles.loadingSpinner} />

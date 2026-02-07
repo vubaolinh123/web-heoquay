@@ -1,1 +1,1 @@
-export { generateOrdersSummaryText, generateCollectOrdersSummaryText, copyToClipboard } from "./copyOrdersText";
+export { generateOrdersSummaryText, generateCollectOrdersSummaryText, generateCollectOrdersSummaryByHour, copyToClipboard } from "./copyOrdersText";

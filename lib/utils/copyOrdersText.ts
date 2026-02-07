@@ -379,6 +379,133 @@ export function generateCollectOrdersSummaryText(
 }
 
 /**
+ * Generate formatted summary text from raw collect order items - GROUPED BY HOUR
+ * This function groups items by delivery hour for kitchen preparation
+ * @param rawItems - Raw items from collectOrdersApi.getRawItems()
+ * @param dateStr - Date string in DD-MM-YYYY format
+ * @param branch - Branch name (optional)
+ */
+export function generateCollectOrdersSummaryByHour(
+    rawItems: CollectOrderRawItem[],
+    dateStr: string,
+    branch?: string
+): string {
+    // Filter items for the specific date and branch
+    let filteredItems = rawItems.filter(item => item.ngayGiaoHang === dateStr);
+
+    if (branch) {
+        filteredItems = filteredItems.filter(item => item.chiNhanh === branch);
+    }
+
+    if (filteredItems.length === 0) {
+        return "Không có đơn hàng nào trong ngày này.";
+    }
+
+    const displayDate = formatDisplayDate(dateStr);
+    const branchName = branch
+        ? branch.replace(/chi nhánh\s*/i, "").trim()
+        : "";
+    const branchText = branchName ? `Chi Nhánh ${branchName}` : "bếp";
+
+    // Group items by hour first, then by product
+    const hourlyGroups = new Map<string, Map<string, { name: string; quantity: number; isHeo: boolean }>>();
+
+    // Also track totals for final summary
+    const totalMap = new Map<string, { name: string; quantity: number; isHeo: boolean }>();
+
+    for (const item of filteredItems) {
+        // Skip shipping fees
+        if (item.tenHang.toLowerCase().includes("phí ship") ||
+            item.tenHang.toLowerCase().includes("phi ship")) {
+            continue;
+        }
+
+        const hour = item.gioGiaoHang ? item.gioGiaoHang.split(":")[0] + ":00" : "Không xác định";
+        const isHeo = isHeoRawItem(item);
+        const productName = item.tenHang.split(" #")[0].trim();
+        const key = productName.toLowerCase();
+
+        // Add to hourly group
+        if (!hourlyGroups.has(hour)) {
+            hourlyGroups.set(hour, new Map());
+        }
+        const hourGroup = hourlyGroups.get(hour)!;
+
+        if (hourGroup.has(key)) {
+            hourGroup.get(key)!.quantity += item.soLuong;
+        } else {
+            hourGroup.set(key, {
+                name: productName,
+                quantity: item.soLuong,
+                isHeo,
+            });
+        }
+
+        // Add to totals
+        if (totalMap.has(key)) {
+            totalMap.get(key)!.quantity += item.soLuong;
+        } else {
+            totalMap.set(key, {
+                name: productName,
+                quantity: item.soLuong,
+                isHeo,
+            });
+        }
+    }
+
+    // Sort hours chronologically
+    const sortedHours = Array.from(hourlyGroups.keys()).sort((a, b) => {
+        if (a === "Không xác định") return 1;
+        if (b === "Không xác định") return -1;
+        return a.localeCompare(b);
+    });
+
+    // Build text
+    let text = `📋 THỐNG KÊ ĐƠN HÀNG CHO BẾP\n`;
+    text += `━━━━━━━━━━━━━━━━━━━━━━\n`;
+    text += `📍 ${branchText} | 📅 ${displayDate}\n\n`;
+
+    // Items grouped by hour
+    for (const hour of sortedHours) {
+        const products = hourlyGroups.get(hour)!;
+        text += `🕐 ${hour}\n`;
+
+        for (const [, product] of products) {
+            const unit = product.isHeo ? "con" : "phần";
+            text += `   • ${product.name}: ${product.quantity} ${unit}\n`;
+        }
+        text += `\n`;
+    }
+
+    // Totals section
+    const heoProducts = Array.from(totalMap.values()).filter(p => p.isHeo);
+    const sideProducts = Array.from(totalMap.values()).filter(p => !p.isHeo);
+
+    text += `✅ Tổng cộng:\n`;
+
+    if (heoProducts.length > 0) {
+        text += `   🐷 Heo:\n`;
+        for (const item of heoProducts) {
+            text += `      • ${item.name}: ${item.quantity} con\n`;
+        }
+    }
+
+    if (sideProducts.length > 0) {
+        text += `   🥢 Phụ phẩm:\n`;
+        for (const item of sideProducts) {
+            text += `      • ${item.name}: ${item.quantity} phần\n`;
+        }
+    }
+
+    // Closing
+    text += `\n━━━━━━━━━━━━━━━━━━━━━━\n`;
+    const totalHeo = heoProducts.reduce((sum, item) => sum + item.quantity, 0);
+    text += `💬 Dạ, tổng cộng ngày mai bếp ${branchText} cần chuẩn bị ${totalHeo} con heo các loại. Nếu anh chị cần thống kê thêm các món khác, em sẽ hỗ trợ ngay ạ!`;
+
+    return text;
+}
+
+/**
  * Copy text to clipboard
  */
 export async function copyToClipboard(text: string): Promise<boolean> {

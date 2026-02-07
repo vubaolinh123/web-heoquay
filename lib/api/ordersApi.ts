@@ -311,3 +311,89 @@ export interface CheckPaidResponse {
     message?: string;
 }
 
+/**
+ * Bulk update type
+ * @param orderIds - Array of order IDs
+ * @param type - Action type: 1 = Gửi nhóm Ship, 2 = Update trạng thái, 3 = Gửi xác nhận, 4 = Gửi mã thanh toán
+ * @returns Promise<boolean> - True if successful
+ */
+export async function bulkUpdateType(
+    orderIds: string[],
+    type: 1 | 2 | 3 | 4,
+    status?: string
+): Promise<boolean> {
+    try {
+        // Build request body - include status if type=2 (update status)
+        const requestBody: { orderIds: string[]; type: number; status?: string } = {
+            orderIds,
+            type,
+        };
+
+        if (type === 2 && status) {
+            requestBody.status = status;
+        }
+
+        const response = await fetch("/api/orders/update-types", {
+            method: "POST",
+            headers: getHeaders(),
+            body: JSON.stringify(requestBody),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || "Không thể thực hiện bulk update");
+        }
+
+        console.log("Bulk update result:", data);
+        return true;
+    } catch (error) {
+        console.error("Bulk update error:", error);
+        throw error;
+    }
+}
+
+// =============================================
+// Address Search API
+// =============================================
+
+export interface AddressResult {
+    id?: string;
+    address: string;
+    shortAddress?: string;
+    lat?: number;
+    lng?: number;
+}
+
+/**
+ * Search for address suggestions using Ahamove API
+ * @param keySearch - Search keyword
+ * @returns Promise<AddressResult[]> - Array of address suggestions
+ */
+export async function searchAhamoveAddress(keySearch: string): Promise<AddressResult[]> {
+    if (!keySearch || keySearch.trim().length < 2) {
+        return [];
+    }
+
+    try {
+        const response = await fetch(
+            `/api/ahamove/search-address?keySearch=${encodeURIComponent(keySearch)}`,
+            {
+                method: "GET",
+                headers: getHeaders(),
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok || data.error !== "0") {
+            console.error("Search address error:", data.message);
+            return [];
+        }
+
+        return data.data || [];
+    } catch (error) {
+        console.error("Search address error:", error);
+        return [];
+    }
+}
